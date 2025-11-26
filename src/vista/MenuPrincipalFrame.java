@@ -2,91 +2,86 @@ package vista;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import modelo.*;
 
 public class MenuPrincipalFrame extends JFrame {
-
-    private ArrayList<Plato> menu;
-    private ArrayList<Inventario> inventario;
-    private String rol;
-
-    public MenuPrincipalFrame(String rol) {
-        this.rol = rol;
-        setTitle("Menú Principal - " + rol);
-        setSize(400, 400);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+    private JButton btnUsuarios, btnReportes, btnInventario, btnSalir;
+    
+    public MenuPrincipalFrame() {
+        initComponents();
         setLocationRelativeTo(null);
-        setLayout(new GridLayout(8, 1, 10, 10));
-
-        cargarDatosEjemplo();
-
-        JLabel lblTitulo = new JLabel("Menú Principal - " + rol, SwingConstants.CENTER);
-        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        add(lblTitulo);
-
-        // Botones principales
-        JButton btnMenu = new JButton("Ver Menú de Platos");
-        JButton btnInventario = new JButton("Inventario");
-        JButton btnReportes = new JButton("Reportes de Ventas");
-        JButton btnPendientes = new JButton("Pedidos Pendientes (Cocina)");
-        JButton btnCliente = new JButton("Mis Pedidos");
-        JButton btnGestionPedidos = new JButton("Gestión de Pedidos (Mesero)");
-        JButton btnSalir = new JButton("Cerrar Sesión");
-
-        // Mostrar botones según el rol
-        switch (rol.toLowerCase()) {
-
-            case "administrador":
-                add(btnMenu);
-                add(btnInventario);
-                add(btnReportes);
-                break;
-
-            case "mesero":
-                add(btnMenu);
-                add(btnGestionPedidos); // ve pedidos hechos por clientes
-                break;
-
-            case "cocinero":
-                add(btnPendientes);  // ve pedidos y los marca como listos
-                break;
-
-            case "cliente":
-                add(btnMenu);
-                add(new JButton("Hacer Pedido") {{
-                    addActionListener(e -> new PedidoFrame(DatosCompartidos.menuGlobal).setVisible(true));
-                }});
-                add(btnCliente); // ver el estado de sus pedidos
-                break;
-        }
-
-        add(btnSalir);
-
-        // Acciones
-        btnMenu.addActionListener(e -> new MenuPlatosFrame(menu).setVisible(true));
-        btnInventario.addActionListener(e -> new InventarioFrame(inventario).setVisible(true));
-        btnReportes.addActionListener(e -> new ReportesFrame().setVisible(true));
-        btnPendientes.addActionListener(e -> new PedidosPendientesFrame().setVisible(true));
-        btnCliente.addActionListener(e -> new ClienteFrame().setVisible(true));
-        btnGestionPedidos.addActionListener(e -> new PedidosMeseroFrame().setVisible(true));
-        btnSalir.addActionListener(e -> {
-            new LoginFrame().setVisible(true);
-            dispose();
-        });
     }
+    
+    private void initComponents() {
+        setTitle("Menú Principal - Administrador");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(500, 400);
+        
+        // Panel principal
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        // Título
+        JLabel titulo = new JLabel("Sistema de Gestión - Administrador", SwingConstants.CENTER);
+        titulo.setFont(new Font("Arial", Font.BOLD, 20));
+        titulo.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+        panel.add(titulo, BorderLayout.NORTH);
+        
+        // Panel de botones - AHORA CON GESTIÓN DE PLATILLOS
+        JPanel panelBotones = new JPanel(new GridLayout(5, 1, 15, 15));
+        panelBotones.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+        
+        // CREAR BOTÓN DE GESTIÓN DE PLATILLOS
+        JButton btnPlatillos = new JButton("🍽️ Gestión de Platillos");
+        btnUsuarios = new JButton("👥 Gestión de Usuarios");
+        btnReportes = new JButton("📊 Reportes y Estadísticas");
+        btnInventario = new JButton("📦 Control de Inventario");
+        btnSalir = new JButton("🚪 Salir");
+        
+        // Estilo de botones
+        Font buttonFont = new Font("Arial", Font.PLAIN, 14);
+        btnPlatillos.setFont(buttonFont);
+        btnUsuarios.setFont(buttonFont);
+        btnReportes.setFont(buttonFont);
+        btnInventario.setFont(buttonFont);
+        btnSalir.setFont(buttonFont);
+        
+        // Agregar botones al panel
+        panelBotones.add(btnPlatillos);
+        panelBotones.add(btnUsuarios);
+        panelBotones.add(btnReportes);
+        panelBotones.add(btnInventario);
+        panelBotones.add(btnSalir);
+        
+        panel.add(panelBotones, BorderLayout.CENTER);
+        
+        // EVENT LISTENER PARA GESTIÓN DE PLATILLOS
+        btnPlatillos.addActionListener(e -> {
+            GestionPlatillosFrame gestionFrame = new GestionPlatillosFrame();
+            gestionFrame.setVisible(true);
+        });
+        
+        // Event listeners para los otros botones (placeholder)
+        btnUsuarios.addActionListener(e -> {
+            new GestionUsuariosFrame().setVisible(true);
+        });
 
-    // Cargar datos simulados
-    private void cargarDatosEjemplo() {
-        menu = new ArrayList<>();
-        menu.add(new Plato(1, "Ceviche", 25.0, "Entrada"));
-        menu.add(new Plato(2, "Lomo Saltado", 30.0, "Fondo"));
-        menu.add(new Plato(3, "Tiramisú", 15.0, "Postre"));
-        DatosCompartidos.menuGlobal = menu;
-
-        inventario = new ArrayList<>();
-        inventario.add(new Inventario(1, "Papas", 30));
-        inventario.add(new Inventario(2, "Pollo", 20));
-        inventario.add(new Inventario(3, "Cebolla", 50));
+        btnReportes.addActionListener(e -> {
+            new ReportesFrame().setVisible(true);
+        });
+        
+        btnInventario.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "Módulo de Inventario\n(En desarrollo)");
+        });
+        
+        btnSalir.addActionListener(e -> {
+            int respuesta = JOptionPane.showConfirmDialog(this, 
+                "¿Está seguro de que desea salir?", "Confirmar salida", 
+                JOptionPane.YES_NO_OPTION);
+            if (respuesta == JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
+        });
+        
+        add(panel);
     }
 }

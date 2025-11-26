@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Pedido {
-    private static int contador = 1;
     private int idPedido;
     private Date fecha;
     private String estado;
@@ -12,6 +11,8 @@ public class Pedido {
     private Cliente cliente;
     private Mesero mesero;
     private Mesa mesa;
+
+    private static int contador = 1;
 
     public Pedido(Cliente cliente, Mesero mesero, Mesa mesa) {
         this.idPedido = contador++;
@@ -25,6 +26,10 @@ public class Pedido {
 
     public int getIdPedido() {
         return idPedido;
+    }
+    
+    public void setIdPedido(int idPedido) {
+        this.idPedido = idPedido;
     }
 
     public String getEstado() {

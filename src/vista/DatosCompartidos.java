@@ -1,10 +1,12 @@
 package vista;
 
 import java.util.ArrayList;
+import modelo.Usuario;
 import modelo.Plato;
 
 public class DatosCompartidos {
 
+     public static Usuario usuarioLogueado;
     // 🔹 Menú global (disponible para todas las ventanas)
     public static ArrayList<Plato> menuGlobal = new ArrayList<>();
 

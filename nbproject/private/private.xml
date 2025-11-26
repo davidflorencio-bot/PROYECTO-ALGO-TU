@@ -6,6 +6,32 @@
             <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/controlador/Main.java</file>
             <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/modelo/Plato.java</file>
             <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/vista/ClienteFrame.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/modelo/Usuario.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/controlador/DatabaseConnection.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/controlador/UsuarioDAO.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/vista/LoginFrame.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/controlador/PlatilloDAO.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/controlador/PedidoDAO.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/vista/PedidoFrame.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/vista/PedidosPendientesFrame.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/vista/DatosCompartidos.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/vista/MenuPrincipalFrame.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/modelo/Administrador.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/modelo/Cliente.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/modelo/Cocina.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/modelo/Cocinero.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/modelo/Factura.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/modelo/Inventario.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/modelo/Mesa.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/modelo/Mesero.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/modelo/Pedido.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/controlador/MesaDAO.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/sistemarestaurante/SistemaRestaurante.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/vista/GestionPlatillosFrame.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/vista/GestionUsuariosFrame.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/controlador/ReporteDAO.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/src/vista/ReportesFrame.java</file>
+            <file>file:/C:/Users/User/Desktop/sistemarestaurante2/.git/config</file>
         </group>
     </open-files>
 </project-private>
