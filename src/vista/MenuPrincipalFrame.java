@@ -26,41 +26,40 @@ public class MenuPrincipalFrame extends JFrame {
         titulo.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         panel.add(titulo, BorderLayout.NORTH);
         
-        // Panel de botones - AHORA CON GESTIÓN DE PLATILLOS
+        // Panel de botones
         JPanel panelBotones = new JPanel(new GridLayout(5, 1, 15, 15));
         panelBotones.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
         
-        // CREAR BOTÓN DE GESTIÓN DE PLATILLOS
+        // Botones sin colores complejos
         JButton btnPlatillos = new JButton("🍽️ Gestión de Platillos");
         btnUsuarios = new JButton("👥 Gestión de Usuarios");
         btnReportes = new JButton("📊 Reportes y Estadísticas");
         btnInventario = new JButton("📦 Control de Inventario");
-        btnSalir = new JButton("🚪 Salir");
+        JButton btnCerrarSesion = new JButton("🚪 Cerrar Sesión");
         
-        // Estilo de botones
+        // Fuente simple
         Font buttonFont = new Font("Arial", Font.PLAIN, 14);
         btnPlatillos.setFont(buttonFont);
         btnUsuarios.setFont(buttonFont);
         btnReportes.setFont(buttonFont);
         btnInventario.setFont(buttonFont);
-        btnSalir.setFont(buttonFont);
+        btnCerrarSesion.setFont(buttonFont);
         
         // Agregar botones al panel
         panelBotones.add(btnPlatillos);
         panelBotones.add(btnUsuarios);
         panelBotones.add(btnReportes);
         panelBotones.add(btnInventario);
-        panelBotones.add(btnSalir);
+        panelBotones.add(btnCerrarSesion);
         
         panel.add(panelBotones, BorderLayout.CENTER);
         
-        // EVENT LISTENER PARA GESTIÓN DE PLATILLOS
+        // EVENT LISTENERS
         btnPlatillos.addActionListener(e -> {
             GestionPlatillosFrame gestionFrame = new GestionPlatillosFrame();
             gestionFrame.setVisible(true);
         });
         
-        // Event listeners para los otros botones (placeholder)
         btnUsuarios.addActionListener(e -> {
             new GestionUsuariosFrame().setVisible(true);
         });
@@ -70,15 +69,17 @@ public class MenuPrincipalFrame extends JFrame {
         });
         
         btnInventario.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Módulo de Inventario\n(En desarrollo)");
+            InventarioFrame inventarioFrame = new InventarioFrame();
+            inventarioFrame.setVisible(true);
         });
         
-        btnSalir.addActionListener(e -> {
+        btnCerrarSesion.addActionListener(e -> {
             int respuesta = JOptionPane.showConfirmDialog(this, 
-                "¿Está seguro de que desea salir?", "Confirmar salida", 
+                "¿Está seguro de que desea cerrar sesión?", "Confirmar salida", 
                 JOptionPane.YES_NO_OPTION);
             if (respuesta == JOptionPane.YES_OPTION) {
-                System.exit(0);
+                new LoginFrame().setVisible(true);
+                this.dispose();
             }
         });
         

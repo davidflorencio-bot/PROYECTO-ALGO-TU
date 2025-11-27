@@ -1,29 +1,28 @@
 package modelo;
 
 public class Inventario {
-    private int idInsumo;
+    private int id;
     private String nombreInsumo;
-    private int cantidad;
-
-    public Inventario(int idInsumo, String nombreInsumo, int cantidad) {
-        this.idInsumo = idInsumo;
-        this.nombreInsumo = nombreInsumo;
-        this.cantidad = cantidad;
-    }
-
-    public void actualizarStock(int cant) {
-        cantidad += cant;
-    }
-
-    public boolean verificarDisponibilidad() {
-        return cantidad > 0;
-    }
-
-    public String getNombreInsumo() {
-        return nombreInsumo;
-    }
-
-    public int getCantidad() {
-        return cantidad;
-    }
+    private double cantidad;
+    private String unidad;
+    private double minimo;
+    
+    // Constructor
+    public Inventario() {}
+    
+    // Getters y Setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    
+    public String getNombreInsumo() { return nombreInsumo; }
+    public void setNombreInsumo(String nombreInsumo) { this.nombreInsumo = nombreInsumo; }
+    
+    public double getCantidad() { return cantidad; }
+    public void setCantidad(double cantidad) { this.cantidad = cantidad; }
+    
+    public String getUnidad() { return unidad; }
+    public void setUnidad(String unidad) { this.unidad = unidad; }
+    
+    public double getMinimo() { return minimo; }
+    public void setMinimo(double minimo) { this.minimo = minimo; }
 }

@@ -8,10 +8,9 @@ public class ReporteDAO {
     
     public List<Object[]> obtenerVentasPorFecha(String fechaInicio, String fechaFin) {
         List<Object[]> ventas = new ArrayList<>();
-        // CONTAR TODOS los pedidos creados, no solo los "listos"
         String sql = "SELECT DATE(fecha_creacion) as fecha, COUNT(*) as pedidos, SUM(total) as total " +
                     "FROM ordenes " +
-                    "WHERE fecha_creacion BETWEEN ? AND ? " +  // QUITAR: AND estado = 'listo'
+                    "WHERE fecha_creacion BETWEEN ? AND ? " +
                     "GROUP BY DATE(fecha_creacion) " +
                     "ORDER BY fecha";
         
@@ -36,14 +35,92 @@ public class ReporteDAO {
         return ventas;
     }
     
+    // NUEVO MÉTODO: Ganancias del día actual (solo pedidos completados)
+    public double obtenerGananciasHoy() {
+        String sql = "SELECT COALESCE(SUM(total), 0) as ganancias FROM ordenes " +
+                    "WHERE DATE(fecha_creacion) = CURDATE() AND estado = 'entregado'";
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            if (rs.next()) {
+                return rs.getDouble("ganancias");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public double obtenerTotalVentas() {
+        String sql = "SELECT COALESCE(SUM(total), 0) as total FROM ordenes WHERE estado = 'entregado'";
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            if (rs.next()) {
+                return rs.getDouble("total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public int obtenerTotalPedidos() {
+        String sql = "SELECT COUNT(*) as total FROM ordenes WHERE estado = 'entregado'";
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public double obtenerVentasHoy() {
+        String sql = "SELECT COALESCE(SUM(total), 0) as total FROM ordenes " +
+                    "WHERE DATE(fecha_creacion) = CURDATE()";
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            if (rs.next()) {
+                return rs.getDouble("total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public int obtenerPedidosPendientes() {
+        String sql = "SELECT COUNT(*) as total FROM ordenes WHERE estado IN ('pendiente', 'en_cocina')";
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
     public List<Object[]> obtenerPlatillosMasVendidos() {
         List<Object[]> platillos = new ArrayList<>();
         String sql = "SELECT p.nombre, SUM(d.cantidad) as total_vendido, " +
-                    "SUM(d.cantidad * p.precio) as ingresos " +
+                    "SUM(d.cantidad * d.precio_unitario) as ingresos " +
                     "FROM detalle_orden d " +
                     "JOIN platillos p ON d.id_platillo = p.id_platillo " +
                     "JOIN ordenes o ON d.id_orden = o.id_orden " +
-                    // QUITAR: WHERE o.estado = 'listo' 
+                    "WHERE o.estado = 'entregado' " +
                     "GROUP BY p.id_platillo, p.nombre " +
                     "ORDER BY total_vendido DESC " +
                     "LIMIT 10";
@@ -64,85 +141,5 @@ public class ReporteDAO {
             e.printStackTrace();
         }
         return platillos;
-    }
-    
-    public double obtenerTotalVentas() {
-        // CONTAR TODOS los pedidos, no solo los "listos"
-        String sql = "SELECT COALESCE(SUM(total), 0) as total FROM ordenes"; // QUITAR: WHERE estado = 'listo'
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            
-            if (rs.next()) {
-                return rs.getDouble("total");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-    
-    public int obtenerTotalPedidos() {
-        // CONTAR TODOS los pedidos
-        String sql = "SELECT COUNT(*) as total FROM ordenes"; // QUITAR: WHERE estado = 'listo'
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            
-            if (rs.next()) {
-                return rs.getInt("total");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-    
-    public double obtenerVentasHoy() {
-        String sql = "SELECT COALESCE(SUM(total), 0) as total FROM ordenes " +
-                    "WHERE DATE(fecha_creacion) = CURDATE()"; // QUITAR: AND estado = 'listo'
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            
-            if (rs.next()) {
-                return rs.getDouble("total");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-    
-    // MANTENER este método para seguimiento de cocina
-    public int obtenerPedidosPendientes() {
-        String sql = "SELECT COUNT(*) as total FROM ordenes WHERE estado IN ('pendiente', 'en_cocina')";
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            
-            if (rs.next()) {
-                return rs.getInt("total");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-    
-    // NUEVO MÉTODO: Obtener pedidos completados (para chef)
-    public int obtenerPedidosCompletados() {
-        String sql = "SELECT COUNT(*) as total FROM ordenes WHERE estado = 'listo'";
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            
-            if (rs.next()) {
-                return rs.getInt("total");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
     }
 }

@@ -5,16 +5,16 @@ import modelo.Pedido;
 import modelo.Plato;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class PedidosPendientesFrame extends javax.swing.JFrame {
+public class PedidosPendientesFrame extends JFrame {
     private PedidoDAO pedidoDAO;
     private DefaultTableModel modelPedidos;
     private Timer timer;
     
-    // Componentes
     private JTable tblPedidos;
     private JButton btnPreparando, btnCompletado, btnActualizar, btnVerDetalles;
     private JScrollPane jScrollPane1;
@@ -29,7 +29,7 @@ public class PedidosPendientesFrame extends javax.swing.JFrame {
     }
     
     private void initComponents() {
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Pedidos Pendientes - Cocina");
         
         // Tabla
@@ -44,40 +44,58 @@ public class PedidosPendientesFrame extends javax.swing.JFrame {
         tblPedidos = new JTable(modelPedidos);
         jScrollPane1 = new JScrollPane(tblPedidos);
         
-        // Botones
-        btnPreparando = new JButton("En Preparacion");
+        // Botones con diseño simple
+        btnPreparando = new JButton("En Preparación");
         btnCompletado = new JButton("Completado");
         btnActualizar = new JButton("Actualizar");
         btnVerDetalles = new JButton("Ver Detalles");
         
+        // NUEVOS BOTONES
+        JButton btnVerInventario = new JButton("Ver Inventario");
+        JButton btnCerrarSesion = new JButton("Cerrar Sesión");
+        
         // Listeners
-        btnPreparando.addActionListener(evt -> btnPreparandoActionPerformed());
-        btnCompletado.addActionListener(evt -> btnCompletadoActionPerformed());
+        btnPreparando.addActionListener(evt -> actualizarEstado("en_cocina"));
+        btnCompletado.addActionListener(evt -> actualizarEstado("listo"));
         btnActualizar.addActionListener(evt -> cargarPedidosPendientes());
         btnVerDetalles.addActionListener(evt -> btnVerDetallesActionPerformed());
+        btnVerInventario.addActionListener(evt -> {
+            InventarioFrame inventarioFrame = new InventarioFrame();
+            inventarioFrame.setVisible(true);
+        });
+        btnCerrarSesion.addActionListener(evt -> {
+            int respuesta = JOptionPane.showConfirmDialog(this, 
+                "¿Cerrar sesión?", "Confirmar", JOptionPane.YES_NO_OPTION);
+            if (respuesta == JOptionPane.YES_OPTION) {
+                new LoginFrame().setVisible(true);
+                this.dispose();
+            }
+        });
         
-        // Layout simple
-        setLayout(new java.awt.BorderLayout());
-        add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        // Layout
+        setLayout(new BorderLayout());
+        add(jScrollPane1, BorderLayout.CENTER);
         
-        JPanel panelBotones = new JPanel();
+        JPanel panelBotones = new JPanel(new FlowLayout());
         panelBotones.add(btnPreparando);
         panelBotones.add(btnCompletado);
         panelBotones.add(btnVerDetalles);
         panelBotones.add(btnActualizar);
-        add(panelBotones, java.awt.BorderLayout.SOUTH);
+        panelBotones.add(btnVerInventario);
+        panelBotones.add(btnCerrarSesion);
         
-        pack();
+        add(panelBotones, BorderLayout.SOUTH);
+        
         setSize(700, 400);
     }
     
     private void initTablaPedidos() {
         // Configurar anchos de columnas
-        tblPedidos.getColumnModel().getColumn(0).setPreferredWidth(50);  // ID
-        tblPedidos.getColumnModel().getColumn(1).setPreferredWidth(60);  // Mesa
-        tblPedidos.getColumnModel().getColumn(2).setPreferredWidth(100); // Estado
-        tblPedidos.getColumnModel().getColumn(3).setPreferredWidth(80);  // Total
-        tblPedidos.getColumnModel().getColumn(4).setPreferredWidth(300); // Platos
+        tblPedidos.getColumnModel().getColumn(0).setPreferredWidth(50);
+        tblPedidos.getColumnModel().getColumn(1).setPreferredWidth(60);
+        tblPedidos.getColumnModel().getColumn(2).setPreferredWidth(100);
+        tblPedidos.getColumnModel().getColumn(3).setPreferredWidth(80);
+        tblPedidos.getColumnModel().getColumn(4).setPreferredWidth(300);
     }
     
     private void cargarPedidosPendientes() {
@@ -105,27 +123,9 @@ public class PedidosPendientesFrame extends javax.swing.JFrame {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                javax.swing.SwingUtilities.invokeLater(() -> cargarPedidosPendientes());
+                SwingUtilities.invokeLater(() -> cargarPedidosPendientes());
             }
-        }, 0, 30000); // Actualizar cada 30 segundos
-    }
-    
-    private void btnPreparandoActionPerformed() {
-        actualizarEstado("en_cocina");
-    }
-    
-    private void btnCompletadoActionPerformed() {
-        actualizarEstado("listo");
-    }
-    
-    private void btnVerDetallesActionPerformed() {
-        int selectedRow = tblPedidos.getSelectedRow();
-        if (selectedRow >= 0) {
-            int idOrden = (int) modelPedidos.getValueAt(selectedRow, 0);
-            mostrarDetallesPedido(idOrden);
-        } else {
-            JOptionPane.showMessageDialog(this, "Seleccione un pedido para ver detalles");
-        }
+        }, 0, 30000);
     }
     
     private void actualizarEstado(String estado) {
@@ -138,6 +138,16 @@ public class PedidosPendientesFrame extends javax.swing.JFrame {
             }
         } else {
             JOptionPane.showMessageDialog(this, "Seleccione un pedido");
+        }
+    }
+    
+    private void btnVerDetallesActionPerformed() {
+        int selectedRow = tblPedidos.getSelectedRow();
+        if (selectedRow >= 0) {
+            int idOrden = (int) modelPedidos.getValueAt(selectedRow, 0);
+            mostrarDetallesPedido(idOrden);
+        } else {
+            JOptionPane.showMessageDialog(this, "Seleccione un pedido para ver detalles");
         }
     }
     
@@ -162,11 +172,10 @@ public class PedidosPendientesFrame extends javax.swing.JFrame {
         
         sb.append("TOTAL: S/").append(String.format("%.2f", total));
         
-        // Usar JTextArea dentro de JScrollPane sin Font específico
         JTextArea textArea = new JTextArea(sb.toString());
         textArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setPreferredSize(new java.awt.Dimension(400, 300));
+        scrollPane.setPreferredSize(new Dimension(400, 300));
         
         JOptionPane.showMessageDialog(this, scrollPane, 
             "Detalles del Pedido #" + idOrden, JOptionPane.INFORMATION_MESSAGE);
