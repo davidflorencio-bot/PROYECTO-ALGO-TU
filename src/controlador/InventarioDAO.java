@@ -26,17 +26,17 @@ public class InventarioDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            // Si la tabla no existe, crear datos de ejemplo
+            
             return obtenerInventarioEjemplo();
         }
         return inventario;
     }
     
-    // Método temporal con datos de ejemplo
+    
     private List<Inventario> obtenerInventarioEjemplo() {
         List<Inventario> inventario = new ArrayList<>();
         
-        // Datos de ejemplo para inventario peruano
+        
         String[][] datos = {
             {"1", "Papa Amarilla", "50", "kg", "10"},
             {"2", "Ají Amarillo", "5", "kg", "2"},

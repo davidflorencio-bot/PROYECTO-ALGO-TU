@@ -21,7 +21,7 @@ public class PlatilloDAO {
                 rs.getInt("id_platillo"),
                 rs.getString("nombre"),
                 rs.getDouble("precio"),
-                rs.getString("categoria") // Ahora usa la categoría real
+                rs.getString("categoria") 
             );
             platillos.add(plato);
         }

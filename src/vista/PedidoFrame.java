@@ -5,29 +5,41 @@ import controlador.PedidoDAO;
 import controlador.MesaDAO;
 import modelo.Plato;
 import modelo.Mesa;
+import modelo.Pedido;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 public class PedidoFrame extends JFrame {
     private PlatilloDAO platilloDAO;
     private PedidoDAO pedidoDAO;
     private MesaDAO mesaDAO;
     private DefaultTableModel modelPedido;
+    private DefaultTableModel modelPedidosListos;
     private List<Plato> platillos;
     private List<Mesa> mesas;
+    private List<Pedido> pedidosListos;
     private double totalPedido;
-    private int idOrdenActual; // NUEVO: Para guardar el ID del pedido actual
+    private int idOrdenActual;
     
-    // Componentes
+    
+    private final Color COLOR_ACENTO = new Color(184, 29, 19);
+    private final Color COLOR_FONDO = new Color(245, 245, 245);
+    private final Color COLOR_TEXTO = new Color(60, 60, 60);
+    
+   
     private JComboBox<String> cmbMesa;
     private JComboBox<String> cmbPlatillo;
     private JTextField txtCantidad;
     private JTextField txtCliente;
-    private JTable tblPedido;
-    private JButton btnAgregar, btnFinalizar, btnLimpiar, btnCerrarSesion;
+    private JTable tblPedido, tblPedidosListos;
+    private JButton btnAgregar, btnEnviarCocina, btnCobrar, btnLimpiar, btnCerrarSesion;
     private JLabel lblTotal;
+    private JTabbedPane tabbedPane;
     
     public PedidoFrame() {
         initComponents();
@@ -36,148 +48,425 @@ public class PedidoFrame extends JFrame {
         mesaDAO = new MesaDAO();
         cargarDatos();
         initTablaPedido();
+        cargarPedidosListos();
         setLocationRelativeTo(null);
-        idOrdenActual = -1; // Inicializar sin pedido activo
+        idOrdenActual = -1;
     }
     
     private void initComponents() {
+        setTitle("Sistema Restaurante - Toma de Pedidos");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setTitle("🍽️ Toma de Pedidos - Mesero");
+        setSize(1100, 750);
+        setResizable(true);
+        setMinimumSize(new Dimension(1000, 700));
         
-        // Crear componentes
-        txtCliente = new JTextField(15);
-        cmbMesa = new JComboBox<>();
-        cmbMesa.setPreferredSize(new Dimension(120, 25));
-        cmbPlatillo = new JComboBox<>();
-        cmbPlatillo.setPreferredSize(new Dimension(200, 25));
-        txtCantidad = new JTextField("1", 3);
+       
+        JPanel panelPrincipal = new JPanel(new BorderLayout());
+        panelPrincipal.setBackground(COLOR_FONDO);
         
-        btnAgregar = new JButton("➕ Agregar al Pedido");
-        btnFinalizar = new JButton("💳 Finalizar Pedido");
-        btnLimpiar = new JButton("🗑️ Limpiar");
-        btnCerrarSesion = new JButton("🚪 Cerrar Sesión");
+      
+        JPanel header = crearHeader("TOMA DE PEDIDOS - MESERO");
+        panelPrincipal.add(header, BorderLayout.NORTH);
         
-        lblTotal = new JLabel("Total: S/0.00");
-        lblTotal.setFont(new Font("Arial", Font.BOLD, 14));
         
-        // Configurar tabla
-        modelPedido = new DefaultTableModel(
+        tabbedPane = new JTabbedPane(); 
+        tabbedPane.setBackground(Color.WHITE);
+        tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        
+       
+        JPanel panelCrearPedido = crearPanelCrearPedido();
+        tabbedPane.addTab("CREAR NUEVO PEDIDO", panelCrearPedido);
+        
+        
+        JPanel panelPedidosListos = crearPanelPedidosListos();
+        tabbedPane.addTab("PEDIDOS LISTOS PARA COBRAR", panelPedidosListos);
+        
+        panelPrincipal.add(tabbedPane, BorderLayout.CENTER);
+        
+        add(panelPrincipal);
+    }
+    
+    private JPanel crearHeader(String titulo) {
+        JPanel header = new JPanel(new BorderLayout());
+        header.setBackground(COLOR_ACENTO);
+        header.setPreferredSize(new Dimension(1100, 80));
+        
+        JLabel lblTitulo = new JLabel(titulo, SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        lblTitulo.setForeground(Color.WHITE);
+        header.add(lblTitulo, BorderLayout.CENTER);
+        
+        return header;
+    }
+    
+    private JPanel crearPanelCrearPedido() {
+        JPanel panel = new JPanel(new BorderLayout(15, 15));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
+        
+        
+        JPanel panelSuperior = crearPanelDatosPedido();
+        panel.add(panelSuperior, BorderLayout.NORTH);
+        
+        
+        JPanel panelCentral = crearPanelTablaPedidos();
+        panel.add(panelCentral, BorderLayout.CENTER);
+        
+        
+        JPanel footerCrearPedido = crearFooterCrearPedido();
+        panel.add(footerCrearPedido, BorderLayout.SOUTH);
+        
+        return panel;
+    }
+    
+    private JPanel crearFooterCrearPedido() {
+        JPanel footer = new JPanel(new BorderLayout());
+        footer.setBackground(COLOR_FONDO);
+        footer.setBorder(BorderFactory.createEmptyBorder(15, 25, 15, 25));
+        
+        
+        btnCerrarSesion = crearBotonSecundario("CERRAR SESION");
+        btnCerrarSesion.addActionListener(e -> cerrarSesion());
+        
+        
+        JPanel panelTotal = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        panelTotal.setBackground(COLOR_FONDO);
+        
+        lblTotal = new JLabel("TOTAL: S/0.00");
+        lblTotal.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        lblTotal.setForeground(COLOR_ACENTO);
+        panelTotal.add(lblTotal);
+        
+        
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
+        panelBotones.setBackground(COLOR_FONDO);
+        
+        btnLimpiar = crearBotonSecundario("LIMPIAR PEDIDO");
+        btnLimpiar.addActionListener(e -> limpiarPedido());
+        
+        btnEnviarCocina = crearBotonPrimario("ENVIAR A COCINA", 180);
+        btnEnviarCocina.addActionListener(e -> enviarPedidoACocina());
+        
+        panelBotones.add(btnLimpiar);
+        panelBotones.add(btnEnviarCocina);
+        
+        footer.add(btnCerrarSesion, BorderLayout.WEST);
+        footer.add(panelTotal, BorderLayout.CENTER);
+        footer.add(panelBotones, BorderLayout.EAST);
+        
+        return footer;
+    }
+    
+    private JPanel crearPanelPedidosListos() {
+        JPanel panel = new JPanel(new BorderLayout(15, 15));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
+
+        
+        JPanel panelInfo = new JPanel(new BorderLayout());
+        panelInfo.setBackground(Color.WHITE);
+        panelInfo.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(Color.LIGHT_GRAY), 
+            "PEDIDOS PREPARADOS - LISTOS PARA COBRAR"
+        ));
+
+        JLabel lblInfo = new JLabel("Estos pedidos han sido marcados como 'LISTOS' por el chef");
+        lblInfo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblInfo.setForeground(COLOR_TEXTO);
+        panelInfo.add(lblInfo, BorderLayout.WEST);
+
+        JButton btnActualizar = crearBotonSecundario("ACTUALIZAR LISTA");
+        btnActualizar.addActionListener(e -> cargarPedidosListos());
+        panelInfo.add(btnActualizar, BorderLayout.EAST);
+
+        
+        modelPedidosListos = new DefaultTableModel(
             new Object[][]{},
-            new String[]{"Platillo", "Cantidad", "Precio", "Subtotal"}
+            new String[]{"ID Pedido", "Mesa", "Total"}
         ) {
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-        tblPedido = new JTable(modelPedido);
-        tblPedido.getColumnModel().getColumn(0).setPreferredWidth(200);
-        tblPedido.getColumnModel().getColumn(1).setPreferredWidth(80);
-        tblPedido.getColumnModel().getColumn(2).setPreferredWidth(80);
-        tblPedido.getColumnModel().getColumn(3).setPreferredWidth(100);
+
+        tblPedidosListos = new JTable(modelPedidosListos);
+        tblPedidosListos.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        tblPedidosListos.setRowHeight(35);
+        tblPedidosListos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+
         
-        JScrollPane scrollPane = new JScrollPane(tblPedido);
-        scrollPane.setPreferredSize(new Dimension(700, 250));
+        tblPedidosListos.getColumnModel().getColumn(0).setPreferredWidth(100);
+        tblPedidosListos.getColumnModel().getColumn(1).setPreferredWidth(80);
+        tblPedidosListos.getColumnModel().getColumn(2).setPreferredWidth(100);
+
+        JScrollPane scrollPane = new JScrollPane(tblPedidosListos);
+        scrollPane.setPreferredSize(new Dimension(900, 300));
+
         
-        // LAYOUT MEJORADO
-        JPanel panelPrincipal = new JPanel(new BorderLayout(10, 10));
-        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel footerPedidosListos = crearFooterPedidosListos();
         
-        // PANEL SUPERIOR - Datos del pedido
-        JPanel panelSuperior = new JPanel(new GridBagLayout());
-        panelSuperior.setBorder(BorderFactory.createTitledBorder("📋 Datos del Pedido"));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        
-        // Fila 1
-        gbc.gridx = 0; gbc.gridy = 0;
-        panelSuperior.add(new JLabel("👤 Cliente:"), gbc);
-        gbc.gridx = 1;
-        panelSuperior.add(txtCliente, gbc);
-        
-        gbc.gridx = 2;
-        panelSuperior.add(new JLabel("🪑 Mesa:"), gbc);
-        gbc.gridx = 3;
-        panelSuperior.add(cmbMesa, gbc);
-        
-        // Fila 2
-        gbc.gridx = 0; gbc.gridy = 1;
-        panelSuperior.add(new JLabel("🍽️ Platillo:"), gbc);
-        gbc.gridx = 1;
-        panelSuperior.add(cmbPlatillo, gbc);
-        
-        gbc.gridx = 2;
-        panelSuperior.add(new JLabel("🔢 Cantidad:"), gbc);
-        gbc.gridx = 3;
-        panelSuperior.add(txtCantidad, gbc);
-        
-        gbc.gridx = 4;
-        panelSuperior.add(btnAgregar, gbc);
-        
-        // PANEL CENTRAL - Tabla de pedidos
-        JPanel panelCentral = new JPanel(new BorderLayout());
-        panelCentral.setBorder(BorderFactory.createTitledBorder("📦 Detalles del Pedido"));
-        panelCentral.add(scrollPane, BorderLayout.CENTER);
-        
-        // PANEL INFERIOR - Botones y total
-        JPanel panelInferior = new JPanel(new BorderLayout());
-        
-        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        panelBotones.add(btnLimpiar);
-        panelBotones.add(btnFinalizar);
-        panelBotones.add(lblTotal);
-        
-        JPanel panelCerrarSesion = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelCerrarSesion.add(btnCerrarSesion);
-        
-        panelInferior.add(panelCerrarSesion, BorderLayout.WEST);
-        panelInferior.add(panelBotones, BorderLayout.EAST);
-        
-        // Ensamblar la interfaz
-        panelPrincipal.add(panelSuperior, BorderLayout.NORTH);
-        panelPrincipal.add(panelCentral, BorderLayout.CENTER);
-        panelPrincipal.add(panelInferior, BorderLayout.SOUTH);
-        
-        add(panelPrincipal);
-        
-        // EVENT LISTENERS CORREGIDOS
-        btnAgregar.addActionListener(e -> agregarPlatoAlPedido());
-        btnFinalizar.addActionListener(e -> finalizarPedidoCompleto());
-        btnLimpiar.addActionListener(e -> limpiarPedido());
-        btnCerrarSesion.addActionListener(e -> cerrarSesion());
-        
-        // Tamaño de la ventana
-        setSize(800, 600);
-        setLocationRelativeTo(null);
+        panel.add(panelInfo, BorderLayout.NORTH);
+        panel.add(scrollPane, BorderLayout.CENTER);
+        panel.add(footerPedidosListos, BorderLayout.SOUTH);
+
+        return panel;
     }
     
+    private JPanel crearFooterPedidosListos() {
+        JPanel footer = new JPanel(new BorderLayout());
+        footer.setBackground(COLOR_FONDO);
+        footer.setBorder(BorderFactory.createEmptyBorder(15, 25, 15, 25));
+        
+        
+        JButton btnCerrarSesionListos = crearBotonSecundario("CERRAR SESION");
+        btnCerrarSesionListos.addActionListener(e -> cerrarSesion());
+        
+        
+        JPanel panelInfo = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        panelInfo.setBackground(COLOR_FONDO);
+        
+        JLabel lblInfo = new JLabel("Seleccione un pedido y haga click en COBRAR");
+        lblInfo.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblInfo.setForeground(COLOR_ACENTO);
+        panelInfo.add(lblInfo);
+        
+        
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
+        panelBotones.setBackground(COLOR_FONDO);
+        
+        btnCobrar = crearBotonPrimario("COBRAR PEDIDO SELECCIONADO", 250);
+        btnCobrar.addActionListener(e -> cobrarPedidoSeleccionado());
+        
+        panelBotones.add(btnCobrar);
+        
+        footer.add(btnCerrarSesionListos, BorderLayout.WEST);
+        footer.add(panelInfo, BorderLayout.CENTER);
+        footer.add(panelBotones, BorderLayout.EAST);
+        
+        return footer;
+    }
+    
+    
+    private void cobrarPedidoSeleccionado() {
+        int selectedRow = tblPedidosListos.getSelectedRow();
+        if (selectedRow >= 0 && selectedRow < pedidosListos.size()) {
+            Pedido pedido = pedidosListos.get(selectedRow);
+            int idOrden = pedido.getIdPedido();
+            double total = pedido.calcularTotal();
+            
+            int respuesta = JOptionPane.showConfirmDialog(this,
+                "¿Confirmar cobro del pedido?\n" +
+                "Pedido #: " + idOrden + "\n" +
+                "Mesa: M" + pedido.getMesa().getNumero() + "\n" +
+                "Total a cobrar: S/" + String.format("%.2f", total),
+                "Cobrar Pedido", 
+                JOptionPane.YES_NO_OPTION);
+            
+            if (respuesta == JOptionPane.YES_OPTION) {
+                if (pedidoDAO.cobrarPedido(idOrden)) {
+                    JOptionPane.showMessageDialog(this, 
+                        "✅ Pedido #" + idOrden + " cobrado exitosamente\n" +
+                        "Total: S/" + String.format("%.2f", total) + "\n" +
+                        "El pedido ahora aparecera en los reportes");
+                    
+                    
+                    cargarPedidosListos();
+                } else {
+                    JOptionPane.showMessageDialog(this, " Error al cobrar el pedido");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, 
+                "Seleccione un pedido de la tabla para cobrar", 
+                "Pedido no seleccionado", 
+                JOptionPane.WARNING_MESSAGE);
+        }
+    }
+    
+    private JPanel crearPanelDatosPedido() {
+        JPanel panel = new JPanel(new GridLayout(2, 1, 10, 10));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(Color.LIGHT_GRAY), 
+            "DATOS DEL PEDIDO"
+        ));
+        
+        
+        JPanel fila1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
+        fila1.setBackground(Color.WHITE);
+        
+        JLabel lblCliente = new JLabel("Cliente:");
+        lblCliente.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        txtCliente = new JTextField(20);
+        txtCliente.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        
+        JLabel lblMesa = new JLabel("Mesa:");
+        lblMesa.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        cmbMesa = new JComboBox<>();
+        cmbMesa.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        cmbMesa.setPreferredSize(new Dimension(120, 30));
+        
+        fila1.add(lblCliente);
+        fila1.add(txtCliente);
+        fila1.add(Box.createHorizontalStrut(20));
+        fila1.add(lblMesa);
+        fila1.add(cmbMesa);
+        
+        
+        JPanel fila2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
+        fila2.setBackground(Color.WHITE);
+        
+        JLabel lblPlatillo = new JLabel("Platillo:");
+        lblPlatillo.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        cmbPlatillo = new JComboBox<>();
+        cmbPlatillo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        cmbPlatillo.setPreferredSize(new Dimension(250, 30));
+        
+        JLabel lblCantidad = new JLabel("Cantidad:");
+        lblCantidad.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        txtCantidad = new JTextField("1", 3);
+        txtCantidad.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtCantidad.setHorizontalAlignment(JTextField.CENTER);
+        
+        btnAgregar = crearBotonPrimario("AGREGAR AL PEDIDO", 180);
+        btnAgregar.addActionListener(e -> agregarPlatoAlPedido());
+        
+        fila2.add(lblPlatillo);
+        fila2.add(cmbPlatillo);
+        fila2.add(Box.createHorizontalStrut(20));
+        fila2.add(lblCantidad);
+        fila2.add(txtCantidad);
+        fila2.add(Box.createHorizontalStrut(20));
+        fila2.add(btnAgregar);
+        
+        panel.add(fila1);
+        panel.add(fila2);
+        
+        return panel;
+    }
+    
+    private JPanel crearPanelTablaPedidos() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(Color.LIGHT_GRAY), 
+            "DETALLES DEL PEDIDO ACTUAL"
+        ));
+        
+        
+        modelPedido = new DefaultTableModel(
+            new Object[][]{},
+            new String[]{"Platillo", "Cantidad", "Precio Unitario", "Subtotal"}
+        ) {
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        tblPedido = new JTable(modelPedido);
+        tblPedido.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        tblPedido.setRowHeight(25);
+        tblPedido.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        
+        // CONFIGURAR ANCHOS DE COLUMNAS
+        tblPedido.getColumnModel().getColumn(0).setPreferredWidth(250);
+        tblPedido.getColumnModel().getColumn(1).setPreferredWidth(80);
+        tblPedido.getColumnModel().getColumn(2).setPreferredWidth(120);
+        tblPedido.getColumnModel().getColumn(3).setPreferredWidth(120);
+        
+        JScrollPane scrollPane = new JScrollPane(tblPedido);
+        scrollPane.setPreferredSize(new Dimension(800, 250));
+        
+        panel.add(scrollPane, BorderLayout.CENTER);
+        
+        return panel;
+    }
+    
+    private JButton crearBotonPrimario(String texto, int ancho) {
+        JButton boton = new JButton(texto);
+        boton.setBackground(COLOR_ACENTO);
+        boton.setForeground(Color.WHITE);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(COLOR_ACENTO.darker(), 2),
+            BorderFactory.createEmptyBorder(12, 20, 12, 20)
+        ));
+        boton.setPreferredSize(new Dimension(ancho, 45));
+        
+        
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                boton.setBackground(COLOR_ACENTO.brighter());
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(COLOR_ACENTO.darker(), 3),
+                    BorderFactory.createEmptyBorder(12, 20, 12, 20)
+                ));
+                boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                boton.setBackground(COLOR_ACENTO);
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(COLOR_ACENTO.darker(), 2),
+                    BorderFactory.createEmptyBorder(12, 20, 12, 20)
+                ));
+                boton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+        
+        return boton;
+    }
+    
+    private JButton crearBotonSecundario(String texto) {
+        JButton boton = new JButton(texto);
+        boton.setBackground(Color.WHITE);
+        boton.setForeground(COLOR_TEXTO);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(180, 180, 180), 1),
+            BorderFactory.createEmptyBorder(10, 15, 10, 15)
+        ));
+        
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                boton.setBackground(COLOR_FONDO);
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(COLOR_ACENTO, 1),
+                    BorderFactory.createEmptyBorder(10, 15, 10, 15)
+                ));
+                boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                boton.setBackground(Color.WHITE);
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(180, 180, 180), 1),
+                    BorderFactory.createEmptyBorder(10, 15, 10, 15)
+                ));
+                boton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+        
+        return boton;
+    }
+    
+   
     private void cargarDatos() {
-        // Cargar mesas disponibles
         mesas = mesaDAO.obtenerMesasDisponibles();
         cmbMesa.removeAllItems();
         
-        System.out.println("Cargando mesas... Total: " + mesas.size());
-        
         for (Mesa mesa : mesas) {
-            String item = "M" + mesa.getNumero();
-            cmbMesa.addItem(item);
-            System.out.println("Mesa agregada: " + item);
+            cmbMesa.addItem("M" + mesa.getNumero());
         }
         
-        // Cargar platillos disponibles
         platillos = platilloDAO.obtenerPlatillosDisponibles();
         cmbPlatillo.removeAllItems();
         for (Plato plato : platillos) {
             cmbPlatillo.addItem(plato.getNombre() + " - S/" + plato.getPrecio());
         }
         
-        // Seleccionar primera mesa y platillo si existen
-        if (cmbMesa.getItemCount() > 0) {
-            cmbMesa.setSelectedIndex(0);
-        }
-        if (cmbPlatillo.getItemCount() > 0) {
-            cmbPlatillo.setSelectedIndex(0);
-        }
+        if (cmbMesa.getItemCount() > 0) cmbMesa.setSelectedIndex(0);
+        if (cmbPlatillo.getItemCount() > 0) cmbPlatillo.setSelectedIndex(0);
     }
     
     private void initTablaPedido() {
@@ -185,12 +474,32 @@ public class PedidoFrame extends JFrame {
         actualizarTotal();
     }
     
-    private void agregarPlatoAlPedido() {
-        // VERIFICAR SI HAY UN PEDIDO ACTIVO, SINO CREAR UNO NUEVO
-        if (idOrdenActual == -1) {
-            if (!crearNuevoPedido()) {
-                return; // Si no se pudo crear el pedido, salir
+    
+    private void cargarPedidosListos() {
+        if (modelPedidosListos != null) {
+            modelPedidosListos.setRowCount(0);
+            pedidosListos = pedidoDAO.obtenerPedidosListosParaCobrar();
+            
+            for (Pedido pedido : pedidosListos) {
+                modelPedidosListos.addRow(new Object[]{
+                    "PED-" + pedido.getIdPedido(),
+                    "M" + pedido.getMesa().getNumero(),
+                    String.format("S/%.2f", pedido.calcularTotal())
+                    
+                });
             }
+            
+            if (pedidosListos.size() > 0) {
+                tabbedPane.setTitleAt(1, "PEDIDOS LISTOS PARA COBRAR (" + pedidosListos.size() + ")");
+            } else {
+                tabbedPane.setTitleAt(1, "PEDIDOS LISTOS PARA COBRAR");
+            }
+        }
+    }
+    
+    private void agregarPlatoAlPedido() {
+        if (idOrdenActual == -1) {
+            if (!crearNuevoPedido()) return;
         }
         
         int selectedIndex = cmbPlatillo.getSelectedIndex();
@@ -204,7 +513,6 @@ public class PedidoFrame extends JFrame {
                     return;
                 }
                 
-                // AGREGAR A LA BASE DE DATOS
                 boolean exito = pedidoDAO.agregarPlatoAPedido(idOrdenActual, plato.getIdPlato(), cantidad);
                 
                 if (exito) {
@@ -222,16 +530,16 @@ public class PedidoFrame extends JFrame {
                     txtCantidad.setText("1");
                     
                     JOptionPane.showMessageDialog(this, 
-                        "✅ Platillo agregado al pedido #" + idOrdenActual);
+                        "Platillo agregado al pedido #" + idOrdenActual);
                 } else {
-                    JOptionPane.showMessageDialog(this, "❌ Error al agregar platillo");
+                    JOptionPane.showMessageDialog(this, "Error al agregar platillo");
                 }
                 
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "La cantidad debe ser un número válido");
+                JOptionPane.showMessageDialog(this, "La cantidad debe ser un numero valido");
             }
         } else {
-            JOptionPane.showMessageDialog(this, "Seleccione un platillo válido");
+            JOptionPane.showMessageDialog(this, "Seleccione un platillo valido");
         }
     }
     
@@ -250,63 +558,59 @@ public class PedidoFrame extends JFrame {
             String mesaSeleccionada = cmbMesa.getSelectedItem().toString();
             int idMesa = Integer.parseInt(mesaSeleccionada.replace("M", ""));
             
-            // CREAR PEDIDO EN BD (método corregido)
             idOrdenActual = pedidoDAO.crearPedido(idMesa);
             
             if (idOrdenActual != -1) {
-                // Actualizar estado de la mesa a OCUPADA
                 mesaDAO.actualizarEstadoMesa(idMesa, "ocupada");
                 
                 JOptionPane.showMessageDialog(this, 
-                    "✅ Pedido #" + idOrdenActual + " creado exitosamente\n" +
-                    "👤 Cliente: " + txtCliente.getText() + "\n" +
-                    "🪑 Mesa: " + mesaSeleccionada);
+                    "Pedido #" + idOrdenActual + " creado exitosamente\n" +
+                    "Cliente: " + txtCliente.getText() + "\n" +
+                    "Mesa: " + mesaSeleccionada);
                 
-                // Deshabilitar cambio de mesa
                 cmbMesa.setEnabled(false);
                 return true;
             } else {
-                JOptionPane.showMessageDialog(this, "❌ Error al crear el pedido");
+                JOptionPane.showMessageDialog(this, "Error al crear el pedido");
                 return false;
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "❌ Error: " + e.getMessage());
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
             return false;
         }
     }
     
-    private void finalizarPedidoCompleto() {
+    
+    private void enviarPedidoACocina() {
         if (idOrdenActual == -1) {
-            JOptionPane.showMessageDialog(this, "No hay un pedido activo para finalizar");
+            JOptionPane.showMessageDialog(this, "No hay un pedido activo para enviar a cocina");
             return;
         }
         
         if (modelPedido.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(this, "Agregue platillos al pedido antes de finalizar");
+            JOptionPane.showMessageDialog(this, "Agregue platillos al pedido antes de enviar a cocina");
             return;
         }
         
         int respuesta = JOptionPane.showConfirmDialog(this,
-            "¿Confirmar pago y finalizar pedido?\n" +
+            "¿Enviar pedido a cocina?\n" +
             "Pedido #: " + idOrdenActual + "\n" +
             "Cliente: " + txtCliente.getText() + "\n" +
-            "Total: S/" + String.format("%.2f", totalPedido),
-            "💳 Finalizar Pedido", 
+            "Total: S/" + String.format("%.2f", totalPedido) + "\n\n" +
+            "⚠️ Una vez enviado, no podrá modificar el pedido",
+            "Enviar a Cocina", 
             JOptionPane.YES_NO_OPTION);
         
         if (respuesta == JOptionPane.YES_OPTION) {
-            // USAR EL NUEVO MÉTODO finalizarPedido() que cambia estado a 'entregado'
-            if (pedidoDAO.finalizarPedido(idOrdenActual)) {
+            if (pedidoDAO.enviarACocina(idOrdenActual)) {
                 JOptionPane.showMessageDialog(this, 
-                    "✅ Pedido #" + idOrdenActual + " finalizado exitosamente\n" +
-                    "💰 Total cobrado: S/" + String.format("%.2f", totalPedido) + "\n" +
-                    "📊 Este pedido ahora aparecerá en los reportes del administrador");
+                    "Pedido #" + idOrdenActual + " enviado a cocina exitosamente\n" +
+                    "El chef recibirá el pedido y lo preparara");
                 
                 limpiarPedido();
-                cargarDatos(); // Recargar mesas disponibles
+                cargarDatos();
             } else {
-                JOptionPane.showMessageDialog(this, "❌ Error al finalizar pedido");
+                JOptionPane.showMessageDialog(this, "Error al enviar pedido a cocina");
             }
         }
     }
@@ -319,19 +623,17 @@ public class PedidoFrame extends JFrame {
         txtCantidad.setText("1");
         idOrdenActual = -1;
         cmbMesa.setEnabled(true);
-        
-        // Recargar mesas por si alguna se liberó
         cargarDatos();
     }
     
     private void actualizarTotal() {
-        lblTotal.setText("Total: S/" + String.format("%.2f", totalPedido));
+        lblTotal.setText("TOTAL: S/" + String.format("%.2f", totalPedido));
     }
     
     private void cerrarSesion() {
         int respuesta = JOptionPane.showConfirmDialog(this,
-            "¿Está seguro de cerrar sesión?",
-            "Cerrar Sesión",
+            "¿Está seguro de cerrar sesion?",
+            "Cerrar Sesion",
             JOptionPane.YES_NO_OPTION);
         
         if (respuesta == JOptionPane.YES_OPTION) {

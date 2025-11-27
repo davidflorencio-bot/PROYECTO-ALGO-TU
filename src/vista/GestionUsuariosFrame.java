@@ -24,11 +24,11 @@ public class GestionUsuariosFrame extends JFrame {
     }
     
     private void initComponents() {
-        setTitle("Gestión de Usuarios - Administrador");
+        setTitle("Gestion de Usuarios - Administrador");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(600, 400);
         
-        // Panel superior - Formulario
+        
         JPanel panelFormulario = new JPanel(new GridLayout(2, 3, 5, 5));
         panelFormulario.setBorder(BorderFactory.createTitledBorder("Agregar/Editar Usuario"));
         
@@ -44,7 +44,7 @@ public class GestionUsuariosFrame extends JFrame {
         cmbRol = new JComboBox<>(new String[]{"mesero", "chef", "administrador"});
         panelFormulario.add(cmbRol);
         
-        // Panel botones formulario
+        
         JPanel panelBotonesForm = new JPanel(new FlowLayout());
         btnAgregar = new JButton("Agregar");
         btnEditar = new JButton("Editar");
@@ -53,7 +53,7 @@ public class GestionUsuariosFrame extends JFrame {
         panelBotonesForm.add(btnAgregar);
         panelBotonesForm.add(btnEditar);
         
-        // Tabla de usuarios
+        
         modelUsuarios = new DefaultTableModel(
             new Object[][]{},
             new String[]{"ID", "Usuario", "Rol"}
@@ -65,21 +65,21 @@ public class GestionUsuariosFrame extends JFrame {
         tblUsuarios = new JTable(modelUsuarios);
         JScrollPane scrollPane = new JScrollPane(tblUsuarios);
         
-        // Panel inferior - Botones
+        
         JPanel panelBotones = new JPanel(new FlowLayout());
         btnEliminar = new JButton("Eliminar Usuario");
         btnEliminar.setEnabled(false);
         
         panelBotones.add(btnEliminar);
         
-        // Layout principal
+        
         setLayout(new BorderLayout(10, 10));
         add(panelFormulario, BorderLayout.NORTH);
         add(panelBotonesForm, BorderLayout.CENTER);
         add(scrollPane, BorderLayout.CENTER);
         add(panelBotones, BorderLayout.SOUTH);
         
-        // Event Listeners
+        
         btnAgregar.addActionListener(e -> agregarUsuario());
         btnEditar.addActionListener(e -> editarUsuario());
         btnEliminar.addActionListener(e -> eliminarUsuario());
@@ -174,8 +174,8 @@ public class GestionUsuariosFrame extends JFrame {
             String username = (String) modelUsuarios.getValueAt(selectedRow, 1);
             
             int confirm = JOptionPane.showConfirmDialog(this,
-                "¿Está seguro de eliminar el usuario: " + username + "?",
-                "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+                "¿Esta seguro de eliminar el usuario: " + username + "?",
+                "Confirmar eliminacion", JOptionPane.YES_NO_OPTION);
             
             if (confirm == JOptionPane.YES_OPTION) {
                 if (usuarioDAO.eliminarUsuario(idUsuario)) {

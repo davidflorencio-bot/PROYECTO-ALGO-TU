@@ -8,19 +8,19 @@ import java.util.ArrayList;
 
 public class MenuPlatosFrame extends JFrame {
 
-    // ✅ Constructor sin parámetros (evita el error "Change constructor")
+    
     public MenuPlatosFrame() {
-        this(new ArrayList<>()); // llama al otro constructor con lista vacía
+        this(new ArrayList<>()); 
     }
 
-    // ✅ Constructor principal (recibe el menú)
+
     public MenuPlatosFrame(ArrayList<Plato> menu) {
-        setTitle("Menú de Platos");
+        setTitle("Menu de Platos");
         setSize(500, 300);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        String[] columnas = {"ID", "Plato", "Precio", "Categoría"};
+        String[] columnas = {"ID", "Plato", "Precio", "Categoria"};
         DefaultTableModel model = new DefaultTableModel(columnas, 0);
 
         for (Plato p : menu) {

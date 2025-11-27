@@ -13,10 +13,14 @@ public class ReportesFrame extends JFrame {
     private DefaultTableModel modelVentas, modelPlatillos;
     private JTable tblVentas, tblPlatillos;
     private JTextField txtFechaInicio, txtFechaFin;
-    private JLabel lblTotalVentas, lblTotalPedidos, lblVentasHoy, lblPedidosPendientes;
+    private JLabel lblTotalVentas, lblTotalPedidos, lblVentasHoy, lblPedidosPendientes, lblGananciasHoy;
+    
+
+    private final Color COLOR_ACENTO = new Color(184, 29, 19);
+    private final Color COLOR_FONDO = new Color(245, 245, 245);
+    private final Color COLOR_TEXTO = new Color(60, 60, 60);
     
     public ReportesFrame() {
-        // INICIALIZAR PRIMERO
         reporteDAO = new ReporteDAO();
         initComponents();
         cargarDatosIniciales();
@@ -24,73 +28,147 @@ public class ReportesFrame extends JFrame {
     }
     
     private void initComponents() {
-        setTitle("Reportes y Estadísticas - Administrador");
+        setTitle("Sistema Restaurante - Reportes y Estadisticas");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(900, 600);
+        setSize(1000, 700);
+        setResizable(true);
+        setMinimumSize(new Dimension(900, 650));
         
-        // Panel principal con pestañas
+      
+        JPanel panelPrincipal = new JPanel(new BorderLayout());
+        panelPrincipal.setBackground(COLOR_FONDO);
+ 
+        JPanel header = crearHeader("REPORTES Y ESTADISTICAS");
+        panelPrincipal.add(header, BorderLayout.NORTH);
+        
+        
         JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setBackground(Color.WHITE);
+        tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 14));
         
-        // Pestaña 1: Resumen General
-        tabbedPane.addTab("📊 Resumen General", crearPanelResumen());
+       
+        tabbedPane.addTab("RESUMEN GENERAL", crearPanelResumen());
         
-        // Pestaña 2: Ventas por Fecha
-        tabbedPane.addTab("📅 Ventas por Fecha", crearPanelVentas());
+     
+        tabbedPane.addTab("VENTAS POR FECHA", crearPanelVentas());
         
-        // Pestaña 3: Platillos Más Vendidos
-        tabbedPane.addTab("🍽️ Platillos Populares", crearPanelPlatillos());
         
-        add(tabbedPane);
+        tabbedPane.addTab("PLATILLOS POPULARES", crearPanelPlatillos());
+        
+        panelPrincipal.add(tabbedPane, BorderLayout.CENTER);
+        
+        
+        JPanel footer = crearFooter();
+        panelPrincipal.add(footer, BorderLayout.SOUTH);
+        
+        add(panelPrincipal);
+    }
+    
+    private JPanel crearHeader(String titulo) {
+        JPanel header = new JPanel(new BorderLayout());
+        header.setBackground(COLOR_ACENTO);
+        header.setPreferredSize(new Dimension(1000, 80));
+        
+        JLabel lblTitulo = new JLabel(titulo, SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        lblTitulo.setForeground(Color.WHITE);
+        header.add(lblTitulo, BorderLayout.CENTER);
+        
+        return header;
     }
     
     private JPanel crearPanelResumen() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
         
-        // Panel de estadísticas
-        JPanel panelStats = new JPanel(new GridLayout(2, 2, 20, 20));
-        panelStats.setBorder(BorderFactory.createTitledBorder("Estadísticas Generales"));
+      
+        JLabel titulo = new JLabel("RESUMEN GENERAL DE VENTAS", SwingConstants.CENTER);
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        titulo.setForeground(COLOR_TEXTO);
+        titulo.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
+        panel.add(titulo, BorderLayout.NORTH);
+        
+        
+        JPanel panelStats = new JPanel(new GridLayout(2, 3, 20, 20));
+        panelStats.setBackground(Color.WHITE);
+        panelStats.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
         double totalVentas = reporteDAO.obtenerTotalVentas();
         int totalPedidos = reporteDAO.obtenerTotalPedidos();
         double ventasHoy = reporteDAO.obtenerVentasHoy();
         int pedidosPendientes = reporteDAO.obtenerPedidosPendientes();
+        double gananciasHoy = reporteDAO.obtenerGananciasHoy();
         
-        lblTotalVentas = new JLabel("Total Ventas: S/" + String.format("%.2f", totalVentas));
-        lblTotalPedidos = new JLabel("Total Pedidos Completados: " + totalPedidos);
-        lblVentasHoy = new JLabel("Ventas Hoy: S/" + String.format("%.2f", ventasHoy));
-        lblPedidosPendientes = new JLabel("Pedidos Pendientes: " + pedidosPendientes);
-        
-        // Estilo
-        Font font = new Font("Arial", Font.BOLD, 14);
-        lblTotalVentas.setFont(font);
-        lblTotalPedidos.setFont(font);
-        lblVentasHoy.setFont(font);
-        lblPedidosPendientes.setFont(font);
-        
-        lblTotalVentas.setForeground(Color.BLUE);
-        lblVentasHoy.setForeground(Color.GREEN);
-        lblPedidosPendientes.setForeground(Color.RED);
+     
+        lblTotalVentas = crearTarjetaEstadistica("VENTAS TOTALES", "S/" + String.format("%.2f", totalVentas), COLOR_ACENTO);
+        lblTotalPedidos = crearTarjetaEstadistica("PEDIDOS COMPLETADOS", String.valueOf(totalPedidos), new Color(52, 152, 219));
+        lblVentasHoy = crearTarjetaEstadistica("VENTAS HOY", "S/" + String.format("%.2f", ventasHoy), new Color(46, 204, 113));
+        lblPedidosPendientes = crearTarjetaEstadistica("PEDIDOS PENDIENTES", String.valueOf(pedidosPendientes), new Color(155, 89, 182));
+        lblGananciasHoy = crearTarjetaEstadistica("GANANCIAS HOY", "S/" + String.format("%.2f", gananciasHoy), new Color(241, 196, 15));
         
         panelStats.add(lblTotalVentas);
         panelStats.add(lblTotalPedidos);
         panelStats.add(lblVentasHoy);
         panelStats.add(lblPedidosPendientes);
+        panelStats.add(lblGananciasHoy);
         
         panel.add(panelStats, BorderLayout.CENTER);
         
         return panel;
     }
     
+    private JLabel crearTarjetaEstadistica(String titulo, String valor, Color color) {
+        JPanel tarjeta = new JPanel(new BorderLayout());
+        tarjeta.setBackground(Color.WHITE);
+        tarjeta.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(color, 2),
+            BorderFactory.createEmptyBorder(20, 15, 20, 15)
+        ));
+        
+        JLabel lblTitulo = new JLabel(titulo, SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblTitulo.setForeground(COLOR_TEXTO);
+        
+        JLabel lblValor = new JLabel(valor, SwingConstants.CENTER);
+        lblValor.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblValor.setForeground(color);
+        
+        tarjeta.add(lblTitulo, BorderLayout.NORTH);
+        tarjeta.add(lblValor, BorderLayout.CENTER);
+        
+        JLabel contenedor = new JLabel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setColor(Color.WHITE);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
+                g2d.setColor(color);
+                g2d.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 15, 15);
+            }
+        };
+        contenedor.setLayout(new BorderLayout());
+        contenedor.add(tarjeta);
+        
+        return contenedor;
+    }
+    
     private JPanel crearPanelVentas() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        // Panel de fechas
-        JPanel panelFechas = new JPanel(new FlowLayout());
-        panelFechas.setBorder(BorderFactory.createTitledBorder("Filtrar por Fecha"));
         
-        // Fechas por defecto (últimos 7 días)
+        JPanel panelFechas = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
+        panelFechas.setBackground(Color.WHITE);
+        panelFechas.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(Color.LIGHT_GRAY), 
+            "FILTRAR POR FECHA"
+        ));
+        
+        
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         
@@ -99,23 +177,32 @@ public class ReportesFrame extends JFrame {
         String fechaInicio = sdf.format(cal.getTime());
         
         panelFechas.add(new JLabel("Desde:"));
-        txtFechaInicio = new JTextField(fechaInicio, 10);
-        panelFechas.add(txtFechaInicio);
+        txtFechaInicio = new JTextField(fechaInicio, 12);
+        txtFechaInicio.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         
         panelFechas.add(new JLabel("Hasta:"));
-        txtFechaFin = new JTextField(fechaFin, 10);
-        panelFechas.add(txtFechaFin);
+        txtFechaFin = new JTextField(fechaFin, 12);
+        txtFechaFin.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         
-        JButton btnGenerar = new JButton("Generar Reporte");
+        JButton btnGenerar = crearBotonSecundario("GENERAR REPORTE");
         btnGenerar.addActionListener(e -> generarReporteVentas());
         panelFechas.add(btnGenerar);
         
-        // Tabla de ventas
+        
         modelVentas = new DefaultTableModel(
             new Object[][]{},
             new String[]{"Fecha", "Pedidos Completados", "Total Ventas"}
-        );
+        ) {
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
         tblVentas = new JTable(modelVentas);
+        tblVentas.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        tblVentas.setRowHeight(25);
+        tblVentas.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        
         JScrollPane scrollPane = new JScrollPane(tblVentas);
         
         panel.add(panelFechas, BorderLayout.NORTH);
@@ -126,21 +213,36 @@ public class ReportesFrame extends JFrame {
     
     private JPanel crearPanelPlatillos() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        JPanel panelSuperior = new JPanel(new FlowLayout());
-        panelSuperior.setBorder(BorderFactory.createTitledBorder("Platillos Más Vendidos"));
+      
+        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        panelSuperior.setBackground(Color.WHITE);
+        panelSuperior.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(Color.LIGHT_GRAY), 
+            "PLATILLOS MÁS VENDIDOS"
+        ));
         
-        JButton btnActualizar = new JButton("Actualizar Lista");
+        JButton btnActualizar = crearBotonSecundario("ACTUALIZAR LISTA");
         btnActualizar.addActionListener(e -> cargarPlatillosPopulares());
         panelSuperior.add(btnActualizar);
         
-        // Tabla de platillos
+    
         modelPlatillos = new DefaultTableModel(
             new Object[][]{},
             new String[]{"Platillo", "Cantidad Vendida", "Ingresos Generados"}
-        );
+        ) {
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
         tblPlatillos = new JTable(modelPlatillos);
+        tblPlatillos.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        tblPlatillos.setRowHeight(25);
+        tblPlatillos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        
         JScrollPane scrollPane = new JScrollPane(tblPlatillos);
         
         panel.add(panelSuperior, BorderLayout.NORTH);
@@ -149,8 +251,60 @@ public class ReportesFrame extends JFrame {
         return panel;
     }
     
+    private JPanel crearFooter() {
+        JPanel footer = new JPanel(new BorderLayout());
+        footer.setBackground(COLOR_FONDO);
+        footer.setBorder(BorderFactory.createEmptyBorder(15, 25, 15, 25));
+        
+        
+        JButton btnCerrar = crearBotonSecundario("CERRAR");
+        btnCerrar.addActionListener(e -> dispose());
+        
+        
+        JLabel lblInfo = new JLabel("Sistema de Gestion - 2025");
+        lblInfo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblInfo.setForeground(COLOR_TEXTO);
+        
+        footer.add(btnCerrar, BorderLayout.WEST);
+        footer.add(lblInfo, BorderLayout.EAST);
+        
+        return footer;
+    }
+    
+    private JButton crearBotonSecundario(String texto) {
+        JButton boton = new JButton(texto);
+        boton.setBackground(Color.WHITE);
+        boton.setForeground(COLOR_TEXTO);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(180, 180, 180), 1),
+            BorderFactory.createEmptyBorder(10, 15, 10, 15)
+        ));
+        
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                boton.setBackground(COLOR_FONDO);
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(COLOR_ACENTO, 1),
+                    BorderFactory.createEmptyBorder(10, 15, 10, 15)
+                ));
+                boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                boton.setBackground(Color.WHITE);
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(180, 180, 180), 1),
+                    BorderFactory.createEmptyBorder(10, 15, 10, 15)
+                ));
+                boton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+        
+        return boton;
+    }
+    
     private void cargarDatosIniciales() {
-        // Cargar datos iniciales
         cargarPlatillosPopulares();
     }
     
@@ -162,7 +316,7 @@ public class ReportesFrame extends JFrame {
             txtFechaInicio.getText(), txtFechaFin.getText());
         
         if (ventas.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "No hay ventas en el período seleccionado");
+            JOptionPane.showMessageDialog(this, "No hay ventas en el periodo seleccionado");
             return;
         }
         
@@ -171,17 +325,17 @@ public class ReportesFrame extends JFrame {
         
         for (Object[] venta : ventas) {
             modelVentas.addRow(new Object[]{
-                venta[0], // fecha
-                venta[1], // pedidos
-                "S/" + String.format("%.2f", venta[2]) // total
+                venta[0], 
+                venta[1], 
+                "S/" + String.format("%.2f", venta[2]) 
             });
             totalPedidosPeriodo += (Integer) venta[1];
             totalPeriodo += (Double) venta[2];
         }
         
-        // Agregar fila de total
+        
         modelVentas.addRow(new Object[]{
-            "TOTAL PERÍODO",
+            "TOTAL PERIODO",
             totalPedidosPeriodo,
             "S/" + String.format("%.2f", totalPeriodo)
         });
@@ -202,14 +356,14 @@ public class ReportesFrame extends JFrame {
         
         for (Object[] platillo : platillos) {
             modelPlatillos.addRow(new Object[]{
-                platillo[0], // nombre
-                platillo[1], // cantidad
-                "S/" + String.format("%.2f", platillo[2]) // ingresos
+                platillo[0], 
+                platillo[1], 
+                "S/" + String.format("%.2f", platillo[2]) 
             });
             totalIngresos += (Double) platillo[2];
         }
         
-        // Agregar fila de total
+        
         modelPlatillos.addRow(new Object[]{
             "TOTAL GENERAL",
             "",

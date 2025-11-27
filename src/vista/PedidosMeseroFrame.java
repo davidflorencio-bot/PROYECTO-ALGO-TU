@@ -9,7 +9,7 @@ public class PedidosMeseroFrame extends JFrame {
     private DefaultTableModel modeloPedidos;
 
     public PedidosMeseroFrame() {
-        setTitle("Gestión de Pedidos - Mesero");
+        setTitle("Gestion de Pedidos - Mesero");
         setSize(550, 300);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);

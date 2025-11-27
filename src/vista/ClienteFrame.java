@@ -29,13 +29,13 @@ public class ClienteFrame extends JFrame {
         panelBotones.add(btnCuenta);
         add(panelBotones, BorderLayout.SOUTH);
 
-        // Cargar los pedidos iniciales
+        
         cargarPedidos();
 
-        // Eventos
+        
         btnActualizar.addActionListener(e -> cargarPedidos());
         btnCuenta.addActionListener(e ->
-                JOptionPane.showMessageDialog(this, "Tu cuenta será llevada a la mesa por un mesero."));
+                JOptionPane.showMessageDialog(this, "Tu cuenta sera llevada a la mesa por un mesero."));
     }
 
     private void cargarPedidos() {

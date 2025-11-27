@@ -6,11 +6,12 @@ import java.util.List;
 
 public class ReporteDAO {
     
+    
     public List<Object[]> obtenerVentasPorFecha(String fechaInicio, String fechaFin) {
         List<Object[]> ventas = new ArrayList<>();
         String sql = "SELECT DATE(fecha_creacion) as fecha, COUNT(*) as pedidos, SUM(total) as total " +
                     "FROM ordenes " +
-                    "WHERE fecha_creacion BETWEEN ? AND ? " +
+                    "WHERE estado = 'cobrado' AND fecha_creacion BETWEEN ? AND ? " +
                     "GROUP BY DATE(fecha_creacion) " +
                     "ORDER BY fecha";
         
@@ -35,10 +36,10 @@ public class ReporteDAO {
         return ventas;
     }
     
-    // NUEVO MÉTODO: Ganancias del día actual (solo pedidos completados)
+    
     public double obtenerGananciasHoy() {
         String sql = "SELECT COALESCE(SUM(total), 0) as ganancias FROM ordenes " +
-                    "WHERE DATE(fecha_creacion) = CURDATE() AND estado = 'entregado'";
+                    "WHERE DATE(fecha_creacion) = CURDATE() AND estado = 'cobrado'";
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -52,8 +53,9 @@ public class ReporteDAO {
         return 0;
     }
     
+    
     public double obtenerTotalVentas() {
-        String sql = "SELECT COALESCE(SUM(total), 0) as total FROM ordenes WHERE estado = 'entregado'";
+        String sql = "SELECT COALESCE(SUM(total), 0) as total FROM ordenes WHERE estado = 'cobrado'";
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -67,8 +69,9 @@ public class ReporteDAO {
         return 0;
     }
     
+    
     public int obtenerTotalPedidos() {
-        String sql = "SELECT COUNT(*) as total FROM ordenes WHERE estado = 'entregado'";
+        String sql = "SELECT COUNT(*) as total FROM ordenes WHERE estado = 'cobrado'";
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -81,10 +84,11 @@ public class ReporteDAO {
         }
         return 0;
     }
+    
     
     public double obtenerVentasHoy() {
         String sql = "SELECT COALESCE(SUM(total), 0) as total FROM ordenes " +
-                    "WHERE DATE(fecha_creacion) = CURDATE()";
+                    "WHERE DATE(fecha_creacion) = CURDATE() AND estado = 'cobrado'";
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -98,8 +102,9 @@ public class ReporteDAO {
         return 0;
     }
     
+    
     public int obtenerPedidosPendientes() {
-        String sql = "SELECT COUNT(*) as total FROM ordenes WHERE estado IN ('pendiente', 'en_cocina')";
+        String sql = "SELECT COUNT(*) as total FROM ordenes WHERE estado IN ('pendiente', 'en_cocina', 'listo')";
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -112,6 +117,34 @@ public class ReporteDAO {
         }
         return 0;
     }
+    
+    
+    public Object[] obtenerEstadisticasEstados() {
+        String sql = "SELECT " +
+                    "SUM(CASE WHEN estado = 'pendiente' THEN 1 ELSE 0 END) as pendientes, " +
+                    "SUM(CASE WHEN estado = 'en_cocina' THEN 1 ELSE 0 END) as en_cocina, " +
+                    "SUM(CASE WHEN estado = 'listo' THEN 1 ELSE 0 END) as listos, " +
+                    "SUM(CASE WHEN estado = 'cobrado' THEN 1 ELSE 0 END) as cobrados " +
+                    "FROM ordenes WHERE DATE(fecha_creacion) = CURDATE()";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            if (rs.next()) {
+                return new Object[]{
+                    rs.getInt("pendientes"),
+                    rs.getInt("en_cocina"),
+                    rs.getInt("listos"),
+                    rs.getInt("cobrados")
+                };
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new Object[]{0, 0, 0, 0};
+    }
+    
     
     public List<Object[]> obtenerPlatillosMasVendidos() {
         List<Object[]> platillos = new ArrayList<>();
@@ -120,7 +153,7 @@ public class ReporteDAO {
                     "FROM detalle_orden d " +
                     "JOIN platillos p ON d.id_platillo = p.id_platillo " +
                     "JOIN ordenes o ON d.id_orden = o.id_orden " +
-                    "WHERE o.estado = 'entregado' " +
+                    "WHERE o.estado = 'cobrado' " +
                     "GROUP BY p.id_platillo, p.nombre " +
                     "ORDER BY total_vendido DESC " +
                     "LIMIT 10";
@@ -141,5 +174,34 @@ public class ReporteDAO {
             e.printStackTrace();
         }
         return platillos;
+    }
+    
+    
+    public List<Object[]> obtenerVentasPorMes(int año) {
+        List<Object[]> ventas = new ArrayList<>();
+        String sql = "SELECT MONTH(fecha_creacion) as mes, COUNT(*) as pedidos, SUM(total) as total " +
+                    "FROM ordenes " +
+                    "WHERE estado = 'cobrado' AND YEAR(fecha_creacion) = ? " +
+                    "GROUP BY MONTH(fecha_creacion) " +
+                    "ORDER BY mes";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, año);
+            ResultSet rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                Object[] venta = {
+                    rs.getInt("mes"),
+                    rs.getInt("pedidos"),
+                    rs.getDouble("total")
+                };
+                ventas.add(venta);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ventas;
     }
 }

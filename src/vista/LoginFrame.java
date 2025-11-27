@@ -3,130 +3,249 @@ package vista;
 import controlador.UsuarioDAO;
 import modelo.Usuario;
 import javax.swing.*;
+import java.awt.*;
 
-public class LoginFrame extends javax.swing.JFrame {
+public class LoginFrame extends JFrame {
     private UsuarioDAO usuarioDAO;
+    
+    
+    private final Color COLOR_ACENTO = new Color(184, 29, 19);
+    private final Color COLOR_FONDO = new Color(245, 245, 245);
+    private final Color COLOR_TEXTO = new Color(60, 60, 60);
+    
+    
+    private JTextField txtUsername;
+    private JPasswordField txtPassword;
+    private JButton btnLogin;
     
     public LoginFrame() {
         initComponents();
         usuarioDAO = new UsuarioDAO();
         setLocationRelativeTo(null);
-        System.out.println("LoginFrame iniciado"); // Debug
     }
     
     private void initComponents() {
-        jLabel1 = new javax.swing.JLabel();
-        txtUsername = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        txtPassword = new javax.swing.JPasswordField();
-        btnLogin = new javax.swing.JButton();
+        setTitle("Sistema Restaurante - Login");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1000, 700);
+        setResizable(true);
+        setMinimumSize(new Dimension(800, 600));
         
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Login - Sistema Restaurante");
         
-        jLabel1.setText("Usuario:");
-        jLabel2.setText("Contraseña:");
+        JPanel panelPrincipal = new JPanel(new BorderLayout());
+        panelPrincipal.setBackground(COLOR_FONDO);
         
-        btnLogin.setText("Ingresar");
-        btnLogin.addActionListener(evt -> btnLoginActionPerformed());
+       
+        JPanel header = crearHeader("INICIAR SESION");
+        panelPrincipal.add(header, BorderLayout.NORTH);
         
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtUsername)
-                    .addComponent(txtPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(95, Short.MAX_VALUE)
-                .addComponent(btnLogin)
-                .addGap(95, 95, 95)));
-        layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(btnLogin)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
-        pack();
+        
+        JPanel panelContenido = crearPanelContenido();
+        panelPrincipal.add(panelContenido, BorderLayout.CENTER);
+        
+        
+        JPanel footer = crearFooter();
+        panelPrincipal.add(footer, BorderLayout.SOUTH);
+        
+        add(panelPrincipal);
+    }
+    
+    private JPanel crearHeader(String titulo) {
+        JPanel header = new JPanel(new BorderLayout());
+        header.setBackground(COLOR_ACENTO);
+        header.setPreferredSize(new Dimension(1000, 100));
+        
+        JLabel lblTitulo = new JLabel(titulo, SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        lblTitulo.setForeground(Color.WHITE);
+        header.add(lblTitulo, BorderLayout.CENTER);
+        
+        return header;
+    }
+    
+    private JPanel crearPanelContenido() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(60, 100, 60, 100));
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(15, 15, 15, 15);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        
+        
+        JLabel lblBienvenida = new JLabel("Bienvenido al Sistema", SwingConstants.CENTER);
+        lblBienvenida.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        lblBienvenida.setForeground(COLOR_TEXTO);
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        panel.add(lblBienvenida, gbc);
+        
+        
+        gbc.gridy = 1;
+        panel.add(Box.createVerticalStrut(30), gbc);
+        
+        
+        JLabel lblUsuario = new JLabel("Usuario:");
+        lblUsuario.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblUsuario.setForeground(COLOR_TEXTO);
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1;
+        panel.add(lblUsuario, gbc);
+        
+        txtUsername = new JTextField(20);
+        txtUsername.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtUsername.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1),
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
+        gbc.gridx = 1; gbc.gridy = 2;
+        panel.add(txtUsername, gbc);
+        
+        
+        JLabel lblPassword = new JLabel("Contraseña:");
+        lblPassword.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblPassword.setForeground(COLOR_TEXTO);
+        gbc.gridx = 0; gbc.gridy = 3;
+        panel.add(lblPassword, gbc);
+        
+        txtPassword = new JPasswordField(20);
+        txtPassword.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtPassword.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1),
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
+        gbc.gridx = 1; gbc.gridy = 3;
+        panel.add(txtPassword, gbc);
+        
+        
+        btnLogin = crearBotonLogin("INGRESAR AL SISTEMA", 300);
+        btnLogin.addActionListener(e -> btnLoginActionPerformed());
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
+        gbc.insets = new Insets(30, 15, 15, 15);
+        panel.add(btnLogin, gbc);
+        
+        return panel;
+    }
+    
+    private JPanel crearFooter() {
+        JPanel footer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        footer.setBackground(COLOR_FONDO);
+        footer.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        JLabel lblFooter = new JLabel("Sistema de Gestion de Restaurante - 2025");
+        lblFooter.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblFooter.setForeground(COLOR_TEXTO);
+        footer.add(lblFooter);
+        
+        return footer;
+    }
+    
+    private JButton crearBotonLogin(String texto, int ancho) {
+        JButton boton = new JButton(texto);
+        boton.setBackground(Color.WHITE);           
+        boton.setForeground(COLOR_ACENTO);          
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(COLOR_ACENTO, 2), 
+            BorderFactory.createEmptyBorder(15, 30, 15, 30)
+        ));
+        boton.setPreferredSize(new Dimension(ancho, 60));
+        
+        
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                boton.setBackground(COLOR_ACENTO);           
+                boton.setForeground(Color.WHITE);            
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(COLOR_ACENTO.darker(), 3),
+                    BorderFactory.createEmptyBorder(15, 30, 15, 30)
+                ));
+                boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                boton.setBackground(Color.WHITE);            
+                boton.setForeground(COLOR_ACENTO);           
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(COLOR_ACENTO, 2),
+                    BorderFactory.createEmptyBorder(15, 30, 15, 30)
+                ));
+                boton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+            
+       
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                boton.setBackground(COLOR_ACENTO.darker());
+                boton.setForeground(Color.WHITE);
+            }
+            
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                boton.setBackground(COLOR_ACENTO);
+                boton.setForeground(Color.WHITE);
+            }
+        });
+        
+        return boton;
     }
     
     private void btnLoginActionPerformed() {
         String username = txtUsername.getText().trim();
         String password = new String(txtPassword.getPassword());
         
-        System.out.println("Intentando login con: " + username); // Debug
-        
         if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Usuario y contraseña requeridos");
+            JOptionPane.showMessageDialog(this, 
+                "Usuario y contraseña requeridos", 
+                "Error de Validacion", 
+                JOptionPane.WARNING_MESSAGE);
             return;
         }
         
-        Usuario usuario = usuarioDAO.validarUsuario(username, password);
         
-        if (usuario != null) {
-            System.out.println("Login exitoso. Usuario: " + usuario.getUsername() + ", Rol: " + usuario.getRol()); // Debug
-            DatosCompartidos.usuarioLogueado = usuario;
-            abrirVentanaPorRol(usuario.getRol());
-            this.dispose();
-        } else {
-            System.out.println("Login fallido"); // Debug
-            JOptionPane.showMessageDialog(this, "Credenciales inválidas");
-        }
+        btnLogin.setText("VERIFICANDO...");
+        btnLogin.setEnabled(false);
+        
+        
+        Timer timer = new Timer(500, e -> {
+            Usuario usuario = usuarioDAO.validarUsuario(username, password);
+            
+            if (usuario != null) {
+                DatosCompartidos.usuarioLogueado = usuario;
+                abrirVentanaPorRol(usuario.getRol());
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, 
+                    "Credenciales invalidas", 
+                    "Error de Autenticacion", 
+                    JOptionPane.ERROR_MESSAGE);
+                btnLogin.setText("INGRESAR AL SISTEMA");
+                btnLogin.setEnabled(true);
+            }
+        });
+        timer.setRepeats(false);
+        timer.start();
     }
     
     private void abrirVentanaPorRol(String rol) {
-        System.out.println("Abriendo ventana para rol: " + rol); // Debug
-        
         try {
             switch (rol.toLowerCase()) {
                 case "mesero":
-                System.out.println("Intentando abrir PedidoFrame...");
-                PedidoFrame pedidoFrame = new PedidoFrame();
-                pedidoFrame.setVisible(true);
-                System.out.println("PedidoFrame abierto");
-                break;
-                
-            case "chef":
-                System.out.println("Intentando abrir PedidosPendientesFrame...");
-                PedidosPendientesFrame chefFrame = new PedidosPendientesFrame();
-                chefFrame.setVisible(true);
-                System.out.println("PedidosPendientesFrame abierto");
-                break;
-                
-            case "administrador":  // CORREGIDO: "admin" en lugar de "administrador"
-                System.out.println("Intentando abrir MenuPrincipalFrame...");
-                MenuPrincipalFrame adminFrame = new MenuPrincipalFrame();
-                adminFrame.setVisible(true);
-                System.out.println("MenuPrincipalFrame abierto");
-                break;
-                    
+                    new PedidoFrame().setVisible(true);
+                    break;
+                case "chef":
+                    new PedidosPendientesFrame().setVisible(true);
+                    break;
+                case "administrador":
+                    new MenuPrincipalFrame().setVisible(true);
+                    break;
                 default:
-                    System.out.println("Rol no reconocido: " + rol);
-                    JOptionPane.showMessageDialog(this, "Rol no configurado: " + rol);
+                    JOptionPane.showMessageDialog(this, 
+                        "Rol no configurado: " + rol, 
+                        "Error del Sistema", 
+                        JOptionPane.ERROR_MESSAGE);
             }
         } catch (Exception e) {
-            System.err.println("Error al abrir ventana: " + e.getMessage());
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error al abrir la interfaz: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, 
+                "Error al abrir la interfaz: " + e.getMessage(), 
+                "Error del Sistema", 
+                JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-    private javax.swing.JButton btnLogin;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPasswordField txtPassword;
-    private javax.swing.JTextField txtUsername;
 }

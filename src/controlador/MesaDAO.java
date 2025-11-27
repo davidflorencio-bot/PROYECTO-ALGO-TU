@@ -35,7 +35,7 @@ public class MesaDAO {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
-            pstmt.setString(1, estado); // 'ocupada' o 'libre'
+            pstmt.setString(1, estado); 
             pstmt.setInt(2, idMesa);
             return pstmt.executeUpdate() > 0;
             

@@ -1,4 +1,4 @@
- package controlador;
+package controlador;
 
 import modelo.Pedido;
 import modelo.Cliente;
@@ -30,7 +30,7 @@ public class PedidoDAO {
     }
     
     public boolean agregarPlatoAPedido(int idOrden, int idPlatillo, int cantidad) {
-        // Obtener precio del platillo
+        
         double precio = obtenerPrecioPlatillo(idPlatillo);
         if (precio == -1) return false;
         
@@ -49,7 +49,7 @@ public class PedidoDAO {
             
             boolean resultado = pstmt.executeUpdate() > 0;
             
-            // Actualizar total del pedido
+            
             if (resultado) {
                 actualizarTotalPedido(idOrden);
             }
@@ -96,16 +96,31 @@ public class PedidoDAO {
         }
     }
     
-    // MÉTODO CRÍTICO: Finalizar pedido (cambia estado a 'entregado')
-    public boolean finalizarPedido(int idOrden) {
-        String sql = "UPDATE ordenes SET estado = 'entregado' WHERE id_orden = ?";
+    
+    public boolean enviarACocina(int idOrden) {
+        String sql = "UPDATE ordenes SET estado = 'en_cocina' WHERE id_orden = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idOrden);
+            return pstmt.executeUpdate() > 0;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    
+    public boolean cobrarPedido(int idOrden) {
+        String sql = "UPDATE ordenes SET estado = 'cobrado' WHERE id_orden = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setInt(1, idOrden);
             boolean resultado = pstmt.executeUpdate() > 0;
             
-            // Liberar la mesa
+            
             if (resultado) {
                 liberarMesa(idOrden);
             }
@@ -118,22 +133,8 @@ public class PedidoDAO {
         return false;
     }
     
-    private void liberarMesa(int idOrden) {
-        String sql = "UPDATE mesas SET estado = 'libre' WHERE id_mesa = (" +
-                    "SELECT id_mesa FROM ordenes WHERE id_orden = ?" +
-                    ")";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setInt(1, idOrden);
-            pstmt.executeUpdate();
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
     
-    public List<Pedido> obtenerPedidosPendientes() {
+    public List<Pedido> obtenerPedidosParaCocina() {
         List<Pedido> pedidos = new ArrayList<>();
         String sql = "SELECT o.id_orden, o.estado, o.total, m.numero_mesa " +
                     "FROM ordenes o JOIN mesas m ON o.id_mesa = m.id_mesa " +
@@ -159,6 +160,50 @@ public class PedidoDAO {
             e.printStackTrace();
         }
         return pedidos;
+    }
+    
+    
+    public List<Pedido> obtenerPedidosListosParaCobrar() {
+        List<Pedido> pedidos = new ArrayList<>();
+        String sql = "SELECT o.id_orden, o.estado, o.total, m.numero_mesa " +
+                    "FROM ordenes o JOIN mesas m ON o.id_mesa = m.id_mesa " +
+                    "WHERE o.estado = 'listo' " +
+                    "ORDER BY o.fecha_creacion";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                int idOrden = rs.getInt("id_orden");
+                String estado = rs.getString("estado");
+                double total = rs.getDouble("total");
+                String numeroMesa = rs.getString("numero_mesa");
+                
+                Pedido pedido = crearPedidoDesdeBD(idOrden, estado, numeroMesa);
+                if (pedido != null) {
+                    pedidos.add(pedido);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return pedidos;
+    }
+    
+    private void liberarMesa(int idOrden) {
+        String sql = "UPDATE mesas SET estado = 'libre' WHERE id_mesa = (" +
+                    "SELECT id_mesa FROM ordenes WHERE id_orden = ?" +
+                    ")";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idOrden);
+            pstmt.executeUpdate();
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
     
     public List<Object[]> obtenerDetallesPedido(int idOrden) {
@@ -188,7 +233,28 @@ public class PedidoDAO {
         return detalles;
     }
     
-    // MÉTODO CORREGIDO: Sin usar setTotal()
+    public boolean actualizarEstadoPedido(int idOrden, String estado) {
+        String sql = "UPDATE ordenes SET estado = ? WHERE id_orden = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, estado);
+            pstmt.setInt(2, idOrden);
+            return pstmt.executeUpdate() > 0;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    
+    public boolean finalizarPedido(int idOrden) {
+        
+        System.out.println("⚠️ ADVERTENCIA: finalizarPedido() está deprecado. Usar enviarACocina() o cobrarPedido()");
+        return false;
+    }
+    
     private Pedido crearPedidoDesdeBD(int idOrden, String estado, String numeroMesa) {
         try {
             int numero = Integer.parseInt(numeroMesa.replace("M", ""));
@@ -200,7 +266,6 @@ public class PedidoDAO {
             pedido.setIdPedido(idOrden);
             pedido.setEstado(estado);
             
-            // NO usar setTotal() - en su lugar cargar los platos para calcular
             cargarPlatosDelPedido(pedido, idOrden);
             return pedido;
             
@@ -236,56 +301,5 @@ public class PedidoDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-    
-    public boolean actualizarEstadoPedido(int idOrden, String estado) {
-        String sql = "UPDATE ordenes SET estado = ? WHERE id_orden = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setString(1, estado);
-            pstmt.setInt(2, idOrden);
-            return pstmt.executeUpdate() > 0;
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    
-    // Obtener información de la mesa
-    public int obtenerIdMesaPorPedido(int idOrden) {
-        String sql = "SELECT id_mesa FROM ordenes WHERE id_orden = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setInt(1, idOrden);
-            ResultSet rs = pstmt.executeQuery();
-            
-            if (rs.next()) {
-                return rs.getInt("id_mesa");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return -1;
-    }
-    
-    // Método para obtener el total desde BD (para reportes)
-    public double obtenerTotalPedido(int idOrden) {
-        String sql = "SELECT total FROM ordenes WHERE id_orden = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setInt(1, idOrden);
-            ResultSet rs = pstmt.executeQuery();
-            
-            if (rs.next()) {
-                return rs.getDouble("total");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
     }
 }

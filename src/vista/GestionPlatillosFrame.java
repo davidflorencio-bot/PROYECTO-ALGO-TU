@@ -23,11 +23,11 @@ public class GestionPlatillosFrame extends JFrame {
     }
     
     private void initComponents() {
-        setTitle("Gestión de Platillos - Administrador");
+        setTitle("Gestion de Platillos - Administrador");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(600, 400);
         
-        // Panel superior - Formulario
+        
         JPanel panelFormulario = new JPanel(new GridLayout(2, 2, 5, 5));
         panelFormulario.setBorder(BorderFactory.createTitledBorder("Agregar/Editar Platillo"));
         
@@ -39,7 +39,7 @@ public class GestionPlatillosFrame extends JFrame {
         txtPrecio = new JTextField();
         panelFormulario.add(txtPrecio);
         
-        // Panel botones formulario
+        
         JPanel panelBotonesForm = new JPanel(new FlowLayout());
         btnAgregar = new JButton("Agregar");
         btnEditar = new JButton("Editar");
@@ -50,7 +50,7 @@ public class GestionPlatillosFrame extends JFrame {
         panelBotonesForm.add(btnEditar);
         panelBotonesForm.add(btnActualizar);
         
-        // Tabla de platillos
+        
         modelPlatillos = new DefaultTableModel(
             new Object[][]{},
             new String[]{"ID", "Nombre", "Precio", "Estado"}
@@ -62,21 +62,21 @@ public class GestionPlatillosFrame extends JFrame {
         tblPlatillos = new JTable(modelPlatillos);
         JScrollPane scrollPane = new JScrollPane(tblPlatillos);
         
-        // Panel inferior - Botones
+        
         JPanel panelBotones = new JPanel(new FlowLayout());
         btnEliminar = new JButton("Eliminar Platillo");
         btnEliminar.setEnabled(false);
         
         panelBotones.add(btnEliminar);
         
-        // Layout principal
+        
         setLayout(new BorderLayout(10, 10));
         add(panelFormulario, BorderLayout.NORTH);
         add(panelBotonesForm, BorderLayout.CENTER);
         add(scrollPane, BorderLayout.CENTER);
         add(panelBotones, BorderLayout.SOUTH);
         
-        // Event Listeners
+        
         btnAgregar.addActionListener(e -> agregarPlatillo());
         btnEditar.addActionListener(e -> editarPlatillo());
         btnEliminar.addActionListener(e -> eliminarPlatillo());
@@ -124,7 +124,7 @@ public class GestionPlatillosFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "Error al agregar platillo");
             }
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Precio debe ser un número válido");
+            JOptionPane.showMessageDialog(this, "Precio debe ser un numero valido");
         }
     }
     
@@ -150,7 +150,7 @@ public class GestionPlatillosFrame extends JFrame {
                     cargarPlatillos();
                 }
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Precio debe ser un número válido");
+                JOptionPane.showMessageDialog(this, "Precio debe ser un numero valido");
             }
         }
     }
@@ -162,8 +162,8 @@ public class GestionPlatillosFrame extends JFrame {
             String nombrePlatillo = (String) modelPlatillos.getValueAt(selectedRow, 1);
             
             int confirm = JOptionPane.showConfirmDialog(this,
-                "¿Está seguro de eliminar el platillo: " + nombrePlatillo + "?",
-                "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+                "¿Esta seguro de eliminar el platillo: " + nombrePlatillo + "?",
+                "Confirmar eliminacion", JOptionPane.YES_NO_OPTION);
             
             if (confirm == JOptionPane.YES_OPTION) {
                 if (platilloDAO.eliminarPlatillo(idPlatillo)) {
