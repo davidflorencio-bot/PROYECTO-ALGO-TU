@@ -1,11 +1,13 @@
 package vista;
 
 import controlador.ReporteDAO;
+import java.io.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date; 
 import java.util.List;
 
 public class ReportesFrame extends JFrame {
@@ -188,6 +190,9 @@ public class ReportesFrame extends JFrame {
         btnGenerar.addActionListener(e -> generarReporteVentas());
         panelFechas.add(btnGenerar);
         
+        JButton btnExportar = crearBotonSecundario("📥 EXPORTAR A TXT");
+        btnExportar.addActionListener(e -> exportarReporteTXT());
+        panelFechas.add(btnExportar);
         
         modelVentas = new DefaultTableModel(
             new Object[][]{},
@@ -272,36 +277,41 @@ public class ReportesFrame extends JFrame {
     }
     
     private JButton crearBotonSecundario(String texto) {
-        JButton boton = new JButton(texto);
-        boton.setBackground(Color.WHITE);
-        boton.setForeground(COLOR_TEXTO);
-        boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        boton.setFocusPainted(false);
-        boton.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(180, 180, 180), 1),
-            BorderFactory.createEmptyBorder(10, 15, 10, 15)
-        ));
-        
-        boton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                boton.setBackground(COLOR_FONDO);
-                boton.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(COLOR_ACENTO, 1),
-                    BorderFactory.createEmptyBorder(10, 15, 10, 15)
-                ));
-                boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                boton.setBackground(Color.WHITE);
-                boton.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(180, 180, 180), 1),
-                    BorderFactory.createEmptyBorder(10, 15, 10, 15)
-                ));
-                boton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    JButton boton = new JButton(texto);
+    
+    // ✅ CORREGIDO: Fondo gris claro, texto negro intenso
+    boton.setBackground(new Color(250, 250, 250));
+    boton.setForeground(new Color(40, 40, 40));  // ✅ NEGRO en lugar de gris
+    boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+    
+    boton.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(new Color(160, 160, 160), 1),
+        BorderFactory.createEmptyBorder(10, 15, 10, 15)
+    ));
+    
+    boton.setFocusPainted(false);
+    
+    // Efecto hover (igual que antes)
+    boton.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mouseEntered(java.awt.event.MouseEvent evt) {
+            boton.setBackground(new Color(240, 240, 240));
+            boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(COLOR_ACENTO, 1),
+                BorderFactory.createEmptyBorder(10, 15, 10, 15)
+            ));
+            boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        }
+        public void mouseExited(java.awt.event.MouseEvent evt) {
+            boton.setBackground(new Color(250, 250, 250));
+            boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(160, 160, 160), 1),
+                BorderFactory.createEmptyBorder(10, 15, 10, 15)
+            ));
+            boton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         });
-        
-        return boton;
+    
+    return boton;
     }
     
     private void cargarDatosIniciales() {
@@ -339,6 +349,85 @@ public class ReportesFrame extends JFrame {
             totalPedidosPeriodo,
             "S/" + String.format("%.2f", totalPeriodo)
         });
+    }
+    
+    private void exportarReporteTXT() {
+    // Verificar que hay datos en la tabla
+    if (modelVentas.getRowCount() == 0) {
+        JOptionPane.showMessageDialog(this, 
+            "No hay datos para exportar. Genere un reporte primero.", 
+            "Sin datos", 
+            JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    // Crear el selector de archivos
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Guardar reporte como TXT");
+    fileChooser.setSelectedFile(new File("reporte_ventas_" + 
+        new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".txt"));
+    
+    // Mostrar diálogo de guardar
+    if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+        File archivo = fileChooser.getSelectedFile();
+        
+        try (PrintWriter writer = new PrintWriter(new FileWriter(archivo))) {
+            // Escribir encabezado del reporte
+            writer.println("=".repeat(60));
+            writer.println("           REPORTE DE VENTAS - SISTEMA RESTAURANTE");
+            writer.println("=".repeat(60));
+            writer.println("Fecha de generación: " + new Date());
+            writer.println("Periodo: " + txtFechaInicio.getText() + " a " + txtFechaFin.getText());
+            writer.println();
+            
+            // Escribir encabezados de tabla
+            writer.printf("%-12s %-20s %-15s%n", 
+                "FECHA", "PEDIDOS COMPLETADOS", "TOTAL VENTAS");
+            writer.println("-".repeat(50));
+            
+            // Escribir datos de la tabla
+            double totalGeneral = 0;
+            int pedidosGeneral = 0;
+            
+            for (int i = 0; i < modelVentas.getRowCount(); i++) {
+                String fecha = modelVentas.getValueAt(i, 0).toString();
+                String pedidos = modelVentas.getValueAt(i, 1).toString();
+                String ventas = modelVentas.getValueAt(i, 2).toString();
+                
+                // Extraer valores numéricos para el total
+                if (!fecha.equals("TOTAL PERIODO")) {
+                    try {
+                        pedidosGeneral += Integer.parseInt(pedidos);
+                        totalGeneral += Double.parseDouble(ventas.replace("S/", "").trim());
+                    } catch (NumberFormatException e) {
+                        // Ignorar filas que no son numéricas
+                    }
+                }
+                
+                writer.printf("%-12s %-20s %-15s%n", fecha, pedidos, ventas);
+            }
+            
+            writer.println("-".repeat(50));
+            writer.printf("%-12s %-20s %-15s%n", 
+                "TOTAL", 
+                pedidosGeneral, 
+                "S/" + String.format("%.2f", totalGeneral));
+            writer.println("=".repeat(60));
+            writer.println("Fin del reporte");
+            
+            // Mensaje de éxito
+            JOptionPane.showMessageDialog(this,
+                "✅ Reporte exportado exitosamente a:\n" + archivo.getAbsolutePath(),
+                "Exportación completada",
+                JOptionPane.INFORMATION_MESSAGE);
+                
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this,
+                "❌ Error al exportar el reporte:\n" + e.getMessage(),
+                "Error de exportación",
+                JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
     
     private void cargarPlatillosPopulares() {

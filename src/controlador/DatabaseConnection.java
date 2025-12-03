@@ -13,10 +13,10 @@ public class DatabaseConnection {
         try {
             System.out.println("=== INTENTANDO CONEXIÓN BD ===");
             Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println(" CONEXIÓN BD EXITOSA");
+            System.out.println(" CONEXION BD EXITOSA");
             return conn;
         } catch (SQLException e) {
-            System.out.println(" ERROR CONEXIÓN BD: " + e.getMessage());
+            System.out.println(" ERROR CONEXION BD: " + e.getMessage());
             e.printStackTrace();
             return null;
         }

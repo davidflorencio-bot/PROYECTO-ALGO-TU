@@ -123,37 +123,44 @@ public class MenuPrincipalFrame extends JFrame {
     }
     
     private JButton crearBotonPrimario(String texto) {
-        JButton boton = new JButton("<html><center>" + texto + "</center></html>");
-        boton.setBackground(COLOR_ACENTO);
-        boton.setForeground(Color.WHITE);
-        boton.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        boton.setFocusPainted(false);
-        boton.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(COLOR_ACENTO.darker(), 2),
-            BorderFactory.createEmptyBorder(30, 20, 30, 20) 
-        ));
-        
-        
-        boton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                boton.setBackground(COLOR_ACENTO.brighter());
-                boton.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(COLOR_ACENTO.darker(), 3),
-                    BorderFactory.createEmptyBorder(30, 20, 30, 20)
-                ));
-                boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                boton.setBackground(COLOR_ACENTO);
-                boton.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(COLOR_ACENTO.darker(), 2),
-                    BorderFactory.createEmptyBorder(30, 20, 30, 20) 
-                ));
-                boton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    JButton boton = new JButton("<html><center>" + texto + "</center></html>");
+    
+    
+    boton.setBackground(COLOR_ACENTO);
+    
+    
+    boton.setForeground(Color.BLACK);
+    
+    
+    boton.setFont(new Font("Segoe UI", Font.BOLD, 16));
+    boton.setFocusPainted(false);
+    boton.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(Color.BLACK, 3), 
+        BorderFactory.createEmptyBorder(25, 20, 25, 20)
+    ));
+    
+    boton.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mouseEntered(java.awt.event.MouseEvent evt) {
+            
+            boton.setBackground(COLOR_ACENTO.brighter());
+            boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(0, 0, 0), 4), // Borde más grueso
+                BorderFactory.createEmptyBorder(25, 20, 25, 20)
+            ));
+            boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        }
+        public void mouseExited(java.awt.event.MouseEvent evt) {
+            
+            boton.setBackground(COLOR_ACENTO);
+            boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.BLACK, 3),
+                BorderFactory.createEmptyBorder(25, 20, 25, 20)
+            ));
+            boton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         });
-        
-        return boton;
+    
+    return boton;
     }
     
     private JPanel crearFooter() {
@@ -186,35 +193,44 @@ public class MenuPrincipalFrame extends JFrame {
     }
     
     private JButton crearBotonSecundario(String texto) {
-        JButton boton = new JButton(texto);
-        boton.setBackground(Color.WHITE);
-        boton.setForeground(COLOR_TEXTO);
-        boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        boton.setFocusPainted(false);
-        boton.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(180, 180, 180), 1),
-            BorderFactory.createEmptyBorder(10, 20, 10, 20) 
-        ));
-        
-        boton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                boton.setBackground(COLOR_FONDO);
-                boton.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(COLOR_ACENTO, 1),
-                    BorderFactory.createEmptyBorder(10, 20, 10, 20) 
-                ));
-                boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                boton.setBackground(Color.WHITE);
-                boton.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(180, 180, 180), 1),
-                    BorderFactory.createEmptyBorder(10, 20, 10, 20) 
-                ));
-                boton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    JButton boton = new JButton(texto);
+    
+    
+    boton.setBackground(new Color(250, 250, 250));
+    
+    
+    boton.setForeground(new Color(40, 40, 40));
+    boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+    
+    
+    boton.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(new Color(160, 160, 160), 1),
+        BorderFactory.createEmptyBorder(10, 20, 10, 20)
+    ));
+    
+    boton.setFocusPainted(false);
+    
+    
+    boton.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mouseEntered(java.awt.event.MouseEvent evt) {
+            boton.setBackground(new Color(240, 240, 240));
+            boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(COLOR_ACENTO, 1),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)
+            ));
+            boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        }
+        public void mouseExited(java.awt.event.MouseEvent evt) {
+            boton.setBackground(new Color(250, 250, 250));
+            boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(160, 160, 160), 1),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)
+            ));
+            boton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         });
-        
-        return boton;
+    
+    return boton;
     }
+    
 }

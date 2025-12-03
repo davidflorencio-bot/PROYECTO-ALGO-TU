@@ -179,36 +179,44 @@ public class InventarioFrame extends JFrame {
     }
     
     private JButton crearBotonSecundario(String texto) {
-        JButton boton = new JButton(texto);
-        boton.setBackground(Color.WHITE);
-        boton.setForeground(COLOR_TEXTO);
-        boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        boton.setFocusPainted(false);
-        boton.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(180, 180, 180), 1),
-            BorderFactory.createEmptyBorder(10, 15, 10, 15)
-        ));
-        
-        boton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                boton.setBackground(COLOR_FONDO);
-                boton.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(COLOR_ACENTO, 1),
-                    BorderFactory.createEmptyBorder(10, 15, 10, 15)
-                ));
-                boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                boton.setBackground(Color.WHITE);
-                boton.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(180, 180, 180), 1),
-                    BorderFactory.createEmptyBorder(10, 15, 10, 15)
-                ));
-                boton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    JButton boton = new JButton(texto);
+    
+    
+    boton.setBackground(new Color(250, 250, 250));
+    
+    
+    boton.setForeground(new Color(40, 40, 40));
+    boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+    
+    
+    boton.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(new Color(160, 160, 160), 1),
+        BorderFactory.createEmptyBorder(10, 15, 10, 15)
+    ));
+    
+    boton.setFocusPainted(false);
+    
+    
+    boton.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mouseEntered(java.awt.event.MouseEvent evt) {
+            boton.setBackground(new Color(240, 240, 240));
+            boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(COLOR_ACENTO, 1),
+                BorderFactory.createEmptyBorder(10, 15, 10, 15)
+            ));
+            boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        }
+        public void mouseExited(java.awt.event.MouseEvent evt) {
+            boton.setBackground(new Color(250, 250, 250));
+            boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(160, 160, 160), 1),
+                BorderFactory.createEmptyBorder(10, 15, 10, 15)
+            ));
+            boton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         });
-        
-        return boton;
+    
+    return boton;
     }
     
     private void cargarInventario() {

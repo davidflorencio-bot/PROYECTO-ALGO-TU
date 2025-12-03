@@ -39,14 +39,14 @@ public class InventarioDAO {
         
         String[][] datos = {
             {"1", "Papa Amarilla", "50", "kg", "10"},
-            {"2", "Ají Amarillo", "5", "kg", "2"},
+            {"2", "AjI Amarillo", "5", "kg", "2"},
             {"3", "Pollo", "30", "kg", "15"},
             {"4", "Pescado", "25", "kg", "10"},
             {"5", "Arroz", "100", "kg", "20"},
             {"6", "Cebolla", "40", "kg", "8"},
             {"7", "Ajo", "3", "kg", "1"},
-            {"8", "Limón", "60", "unidades", "20"},
-            {"9", "Maíz Morado", "15", "kg", "5"},
+            {"8", "Limon", "60", "unidades", "20"},
+            {"9", "Maiz Morado", "15", "kg", "5"},
             {"10", "Leche", "30", "litros", "10"}
         };
         
