@@ -1,5 +1,6 @@
 package vista;
 
+import util.DatosSesion;
 import controlador.UsuarioDAO;
 import modelo.Usuario;
 import javax.swing.*;
@@ -207,7 +208,7 @@ public class LoginFrame extends JFrame {
             Usuario usuario = usuarioDAO.validarUsuario(username, password);
             
             if (usuario != null) {
-                DatosCompartidos.usuarioLogueado = usuario;
+                DatosSesion.usuarioLogueado = usuario;
                 abrirVentanaPorRol(usuario.getRol());
                 this.dispose();
             } else {
@@ -229,10 +230,10 @@ public class LoginFrame extends JFrame {
                 case "mesero":
                     new PedidoFrame().setVisible(true);
                     break;
-                case "chef":
+                case "cocinero":
                     new PedidosPendientesFrame().setVisible(true);
                     break;
-                case "administrador":
+                case "admin":
                     new MenuPrincipalFrame().setVisible(true);
                     break;
                 default:

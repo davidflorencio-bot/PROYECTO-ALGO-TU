@@ -1,35 +1,35 @@
 package vista;
 
-import controlador.PlatilloDAO;
+import controlador.PlatoDAO;
 import modelo.Plato;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
-public class GestionPlatillosFrame extends JFrame {
-    private PlatilloDAO platilloDAO;
-    private DefaultTableModel modelPlatillos;
-    private JTable tblPlatillos;
+public class GestionPlatosFrame extends JFrame {
+    private PlatoDAO platoDAO;
+    private DefaultTableModel modelPlatos;
+    private JTable tblPlatos;
     private JTextField txtNombre, txtPrecio;
     private JButton btnAgregar, btnEditar, btnEliminar, btnActualizar;
-    private List<Plato> platillos;
+    private List<Plato> platos;
     
-    public GestionPlatillosFrame() {
+    public GestionPlatosFrame() {
         initComponents();
-        platilloDAO = new PlatilloDAO();
-        cargarPlatillos();
+        platoDAO = new PlatoDAO();
+        cargarPlatos();
         setLocationRelativeTo(null);
     }
     
     private void initComponents() {
-        setTitle("Gestion de Platillos - Administrador");
+        setTitle("Gestion de Platos - Administrador");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(600, 400);
         
         
         JPanel panelFormulario = new JPanel(new GridLayout(2, 2, 5, 5));
-        panelFormulario.setBorder(BorderFactory.createTitledBorder("Agregar/Editar Platillo"));
+        panelFormulario.setBorder(BorderFactory.createTitledBorder("Agregar/Editar Plato"));
         
         panelFormulario.add(new JLabel("Nombre:"));
         txtNombre = new JTextField();
@@ -51,7 +51,7 @@ public class GestionPlatillosFrame extends JFrame {
         panelBotonesForm.add(btnActualizar);
         
         
-        modelPlatillos = new DefaultTableModel(
+        modelPlatos = new DefaultTableModel(
             new Object[][]{},
             new String[]{"ID", "Nombre", "Precio", "Estado"}
         ) {
@@ -59,12 +59,12 @@ public class GestionPlatillosFrame extends JFrame {
                 return false;
             }
         };
-        tblPlatillos = new JTable(modelPlatillos);
-        JScrollPane scrollPane = new JScrollPane(tblPlatillos);
+        tblPlatos = new JTable(modelPlatos);
+        JScrollPane scrollPane = new JScrollPane(tblPlatos);
         
         
         JPanel panelBotones = new JPanel(new FlowLayout());
-        btnEliminar = new JButton("Eliminar Platillo");
+        btnEliminar = new JButton("Eliminar Plato");
         btnEliminar.setEnabled(false);
         
         panelBotones.add(btnEliminar);
@@ -77,24 +77,24 @@ public class GestionPlatillosFrame extends JFrame {
         add(panelBotones, BorderLayout.SOUTH);
         
         
-        btnAgregar.addActionListener(e -> agregarPlatillo());
-        btnEditar.addActionListener(e -> editarPlatillo());
-        btnEliminar.addActionListener(e -> eliminarPlatillo());
-        btnActualizar.addActionListener(e -> cargarPlatillos());
+        btnAgregar.addActionListener(e -> agregarPlato());
+        btnEditar.addActionListener(e -> editarPlato());
+        btnEliminar.addActionListener(e -> eliminarPlato());
+        btnActualizar.addActionListener(e -> cargarPlatos());
         
-        tblPlatillos.getSelectionModel().addListSelectionListener(e -> {
-            boolean haySeleccion = tblPlatillos.getSelectedRow() >= 0;
+        tblPlatos.getSelectionModel().addListSelectionListener(e -> {
+            boolean haySeleccion = tblPlatos.getSelectedRow() >= 0;
             btnEditar.setEnabled(haySeleccion);
             btnEliminar.setEnabled(haySeleccion);
         });
     }
     
-    private void cargarPlatillos() {
-        modelPlatillos.setRowCount(0);
-        platillos = platilloDAO.obtenerTodosPlatillos();
+    private void cargarPlatos() {
+        modelPlatos.setRowCount(0);
+        platos = platoDAO.obtenerTodosPlatos();
         
-        for (Plato plato : platillos) {
-            modelPlatillos.addRow(new Object[]{
+        for (Plato plato : platos) {
+            modelPlatos.addRow(new Object[]{
                 plato.getIdPlato(),
                 plato.getNombre(),
                 String.format("S/%.2f", plato.getPrecio()),
@@ -103,7 +103,7 @@ public class GestionPlatillosFrame extends JFrame {
         }
     }
     
-    private void agregarPlatillo() {
+    private void agregarPlato() {
         String nombre = txtNombre.getText().trim();
         String precioStr = txtPrecio.getText().trim();
         
@@ -116,10 +116,10 @@ public class GestionPlatillosFrame extends JFrame {
             double precio = Double.parseDouble(precioStr);
             Plato nuevoPlato = new Plato(0, nombre, precio, "General");
             
-            if (platilloDAO.agregarPlatillo(nuevoPlato)) {
-                JOptionPane.showMessageDialog(this, "Platillo agregado exitosamente");
+            if (platoDAO.agregarPlato(nuevoPlato)) {
+                JOptionPane.showMessageDialog(this, "Plato agregado exitosamente");
                 limpiarFormulario();
-                cargarPlatillos();
+                cargarPlatos();
             } else {
                 JOptionPane.showMessageDialog(this, "Error al agregar platillo");
             }
@@ -128,10 +128,10 @@ public class GestionPlatillosFrame extends JFrame {
         }
     }
     
-    private void editarPlatillo() {
-        int selectedRow = tblPlatillos.getSelectedRow();
+    private void editarPlato() {
+        int selectedRow = tblPlatos.getSelectedRow();
         if (selectedRow >= 0) {
-            int idPlatillo = (int) modelPlatillos.getValueAt(selectedRow, 0);
+            int idPlato = (int) modelPlatos.getValueAt(selectedRow, 0);
             String nombre = txtNombre.getText().trim();
             String precioStr = txtPrecio.getText().trim();
             
@@ -142,12 +142,12 @@ public class GestionPlatillosFrame extends JFrame {
             
             try {
                 double precio = Double.parseDouble(precioStr);
-                Plato platillo = new Plato(idPlatillo, nombre, precio, "General");
+                Plato platillo = new Plato(idPlato, nombre, precio, "General");
                 
-                if (platilloDAO.actualizarPlatillo(platillo)) {
-                    JOptionPane.showMessageDialog(this, "Platillo actualizado exitosamente");
+                if (platoDAO.actualizarPlato(platillo)) {
+                    JOptionPane.showMessageDialog(this, "Plato actualizado exitosamente");
                     limpiarFormulario();
-                    cargarPlatillos();
+                    cargarPlatos();
                 }
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(this, "Precio debe ser un numero valido");
@@ -155,20 +155,20 @@ public class GestionPlatillosFrame extends JFrame {
         }
     }
     
-    private void eliminarPlatillo() {
-        int selectedRow = tblPlatillos.getSelectedRow();
+    private void eliminarPlato() {
+        int selectedRow = tblPlatos.getSelectedRow();
         if (selectedRow >= 0) {
-            int idPlatillo = (int) modelPlatillos.getValueAt(selectedRow, 0);
-            String nombrePlatillo = (String) modelPlatillos.getValueAt(selectedRow, 1);
+            int idPlato = (int) modelPlatos.getValueAt(selectedRow, 0);
+            String nombrePlato = (String) modelPlatos.getValueAt(selectedRow, 1);
             
             int confirm = JOptionPane.showConfirmDialog(this,
-                "¿Esta seguro de eliminar el platillo: " + nombrePlatillo + "?",
+                "¿Esta seguro de eliminar el platillo: " + nombrePlato + "?",
                 "Confirmar eliminacion", JOptionPane.YES_NO_OPTION);
             
             if (confirm == JOptionPane.YES_OPTION) {
-                if (platilloDAO.eliminarPlatillo(idPlatillo)) {
-                    JOptionPane.showMessageDialog(this, "Platillo eliminado");
-                    cargarPlatillos();
+                if (platoDAO.eliminarPlato(idPlato)) {
+                    JOptionPane.showMessageDialog(this, "Plato eliminado");
+                    cargarPlatos();
                 }
             }
         }

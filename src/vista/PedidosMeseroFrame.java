@@ -1,5 +1,6 @@
 package vista;
 
+import util.DatosSesion;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -39,7 +40,7 @@ public class PedidosMeseroFrame extends JFrame {
 
     private void cargarPedidos() {
         modeloPedidos.setRowCount(0);
-        ArrayList<String[]> pedidos = DatosCompartidos.obtenerPedidos();
+        ArrayList<String[]> pedidos = DatosSesion.obtenerPedidos();
         int i = 1;
         for (String[] p : pedidos) {
             modeloPedidos.addRow(new Object[]{i++, p[0], p[1], p[2]});
@@ -49,7 +50,7 @@ public class PedidosMeseroFrame extends JFrame {
     private void cambiarEstado(JTable tabla, String nuevoEstado) {
         int fila = tabla.getSelectedRow();
         if (fila != -1) {
-            DatosCompartidos.obtenerPedidos().get(fila)[2] = nuevoEstado;
+            DatosSesion.obtenerPedidos().get(fila)[2] = nuevoEstado;
             cargarPedidos();
             JOptionPane.showMessageDialog(this, "Pedido marcado como " + nuevoEstado + ".");
         } else {

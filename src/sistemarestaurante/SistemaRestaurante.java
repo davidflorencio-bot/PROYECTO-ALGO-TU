@@ -1,20 +1,24 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package sistemarestaurante;
 
-/**
- *
- * @author LENOVO
- */
-public class SistemaRestaurante {
+import vista.LoginFrame;
+import javax.swing.*;
 
-    /**
-     * @param args the command line arguments
-     */
+public class SistemaRestaurante {
     public static void main(String[] args) {
-        // TODO code application logic here
+        System.out.println("=== INICIANDO SISTEMA RESTAURANTE ===");
+        
+        // Configurar look and feel
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        // Ejecutar en el hilo de EDT
+        SwingUtilities.invokeLater(() -> {
+            LoginFrame login = new LoginFrame();
+            login.setVisible(true);
+            System.out.println("LoginFrame hecho visible");
+        });
     }
-    
 }

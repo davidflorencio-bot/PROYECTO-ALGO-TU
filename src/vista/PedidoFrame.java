@@ -1,6 +1,6 @@
 package vista;
 
-import controlador.PlatilloDAO;
+import controlador.PlatoDAO;
 import controlador.PedidoDAO;
 import controlador.MesaDAO;
 import modelo.Plato;
@@ -15,25 +15,23 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 public class PedidoFrame extends JFrame {
-    private PlatilloDAO platilloDAO;
+    private PlatoDAO platoDAO;
     private PedidoDAO pedidoDAO;
     private MesaDAO mesaDAO;
     private DefaultTableModel modelPedido;
     private DefaultTableModel modelPedidosListos;
-    private List<Plato> platillos;
+    private List<Plato> platos;
     private List<Mesa> mesas;
     private List<Pedido> pedidosListos;
     private double totalPedido;
     private int idOrdenActual;
     
-    
     private final Color COLOR_ACENTO = new Color(184, 29, 19);
     private final Color COLOR_FONDO = new Color(245, 245, 245);
     private final Color COLOR_TEXTO = new Color(60, 60, 60);
     
-   
     private JComboBox<String> cmbMesa;
-    private JComboBox<String> cmbPlatillo;
+    private JComboBox<String> cmbPlato;
     private JTextField txtCantidad;
     private JTextField txtCliente;
     private JTable tblPedido, tblPedidosListos;
@@ -43,7 +41,7 @@ public class PedidoFrame extends JFrame {
     
     public PedidoFrame() {
         initComponents();
-        platilloDAO = new PlatilloDAO();
+        platoDAO = new PlatoDAO();
         pedidoDAO = new PedidoDAO();
         mesaDAO = new MesaDAO();
         cargarDatos();
@@ -60,23 +58,18 @@ public class PedidoFrame extends JFrame {
         setResizable(true);
         setMinimumSize(new Dimension(1000, 700));
         
-       
         JPanel panelPrincipal = new JPanel(new BorderLayout());
         panelPrincipal.setBackground(COLOR_FONDO);
         
-      
         JPanel header = crearHeader("TOMA DE PEDIDOS - MESERO");
         panelPrincipal.add(header, BorderLayout.NORTH);
-        
         
         tabbedPane = new JTabbedPane(); 
         tabbedPane.setBackground(Color.WHITE);
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 14));
         
-       
         JPanel panelCrearPedido = crearPanelCrearPedido();
         tabbedPane.addTab("CREAR NUEVO PEDIDO", panelCrearPedido);
-        
         
         JPanel panelPedidosListos = crearPanelPedidosListos();
         tabbedPane.addTab("PEDIDOS LISTOS PARA COBRAR", panelPedidosListos);
@@ -104,14 +97,11 @@ public class PedidoFrame extends JFrame {
         panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
         
-        
         JPanel panelSuperior = crearPanelDatosPedido();
         panel.add(panelSuperior, BorderLayout.NORTH);
         
-        
         JPanel panelCentral = crearPanelTablaPedidos();
         panel.add(panelCentral, BorderLayout.CENTER);
-        
         
         JPanel footerCrearPedido = crearFooterCrearPedido();
         panel.add(footerCrearPedido, BorderLayout.SOUTH);
@@ -124,10 +114,8 @@ public class PedidoFrame extends JFrame {
         footer.setBackground(COLOR_FONDO);
         footer.setBorder(BorderFactory.createEmptyBorder(15, 25, 15, 25));
         
-        
         btnCerrarSesion = crearBotonSecundario("CERRAR SESION");
         btnCerrarSesion.addActionListener(e -> cerrarSesion());
-        
         
         JPanel panelTotal = new JPanel(new FlowLayout(FlowLayout.CENTER));
         panelTotal.setBackground(COLOR_FONDO);
@@ -137,14 +125,13 @@ public class PedidoFrame extends JFrame {
         lblTotal.setForeground(COLOR_ACENTO);
         panelTotal.add(lblTotal);
         
-        
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
         panelBotones.setBackground(COLOR_FONDO);
         
         btnLimpiar = crearBotonSecundario("LIMPIAR PEDIDO");
         btnLimpiar.addActionListener(e -> limpiarPedido());
         
-        btnEnviarCocina = crearBotonPrimario("ENVIAR A COCINA", 180);
+        btnEnviarCocina = crearBotonEnviarCocina("ENVIAR A COCINA", 180);
         btnEnviarCocina.addActionListener(e -> enviarPedidoACocina());
         
         panelBotones.add(btnLimpiar);
@@ -162,7 +149,6 @@ public class PedidoFrame extends JFrame {
         panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
 
-        
         JPanel panelInfo = new JPanel(new BorderLayout());
         panelInfo.setBackground(Color.WHITE);
         panelInfo.setBorder(BorderFactory.createTitledBorder(
@@ -179,7 +165,6 @@ public class PedidoFrame extends JFrame {
         btnActualizar.addActionListener(e -> cargarPedidosListos());
         panelInfo.add(btnActualizar, BorderLayout.EAST);
 
-        
         modelPedidosListos = new DefaultTableModel(
             new Object[][]{},
             new String[]{"ID Pedido", "Mesa", "Total"}
@@ -194,7 +179,6 @@ public class PedidoFrame extends JFrame {
         tblPedidosListos.setRowHeight(35);
         tblPedidosListos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 
-        
         tblPedidosListos.getColumnModel().getColumn(0).setPreferredWidth(100);
         tblPedidosListos.getColumnModel().getColumn(1).setPreferredWidth(80);
         tblPedidosListos.getColumnModel().getColumn(2).setPreferredWidth(100);
@@ -202,7 +186,6 @@ public class PedidoFrame extends JFrame {
         JScrollPane scrollPane = new JScrollPane(tblPedidosListos);
         scrollPane.setPreferredSize(new Dimension(900, 300));
 
-        
         JPanel footerPedidosListos = crearFooterPedidosListos();
         
         panel.add(panelInfo, BorderLayout.NORTH);
@@ -217,10 +200,8 @@ public class PedidoFrame extends JFrame {
         footer.setBackground(COLOR_FONDO);
         footer.setBorder(BorderFactory.createEmptyBorder(15, 25, 15, 25));
         
-        
         JButton btnCerrarSesionListos = crearBotonSecundario("CERRAR SESION");
         btnCerrarSesionListos.addActionListener(e -> cerrarSesion());
-        
         
         JPanel panelInfo = new JPanel(new FlowLayout(FlowLayout.CENTER));
         panelInfo.setBackground(COLOR_FONDO);
@@ -230,11 +211,10 @@ public class PedidoFrame extends JFrame {
         lblInfo.setForeground(COLOR_ACENTO);
         panelInfo.add(lblInfo);
         
-        
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
         panelBotones.setBackground(COLOR_FONDO);
         
-        btnCobrar = crearBotonPrimario("COBRAR PEDIDO SELECCIONADO", 250);
+        btnCobrar = crearBotonCobrar("COBRAR PEDIDO SELECCIONADO", 250);
         btnCobrar.addActionListener(e -> cobrarPedidoSeleccionado());
         
         panelBotones.add(btnCobrar);
@@ -245,7 +225,6 @@ public class PedidoFrame extends JFrame {
         
         return footer;
     }
-    
     
     private void cobrarPedidoSeleccionado() {
         int selectedRow = tblPedidosListos.getSelectedRow();
@@ -269,7 +248,6 @@ public class PedidoFrame extends JFrame {
                         "Total: S/" + String.format("%.2f", total) + "\n" +
                         "El pedido ahora aparecera en los reportes");
                     
-                    
                     cargarPedidosListos();
                 } else {
                     JOptionPane.showMessageDialog(this, " Error al cobrar el pedido");
@@ -291,7 +269,6 @@ public class PedidoFrame extends JFrame {
             "DATOS DEL PEDIDO"
         ));
         
-        
         JPanel fila1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
         fila1.setBackground(Color.WHITE);
         
@@ -312,15 +289,14 @@ public class PedidoFrame extends JFrame {
         fila1.add(lblMesa);
         fila1.add(cmbMesa);
         
-        
         JPanel fila2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
         fila2.setBackground(Color.WHITE);
         
-        JLabel lblPlatillo = new JLabel("Platillo:");
-        lblPlatillo.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        cmbPlatillo = new JComboBox<>();
-        cmbPlatillo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        cmbPlatillo.setPreferredSize(new Dimension(250, 30));
+        JLabel lblPlato = new JLabel("Plato:");
+        lblPlato.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        cmbPlato = new JComboBox<>();
+        cmbPlato.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        cmbPlato.setPreferredSize(new Dimension(250, 30));
         
         JLabel lblCantidad = new JLabel("Cantidad:");
         lblCantidad.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -328,11 +304,11 @@ public class PedidoFrame extends JFrame {
         txtCantidad.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         txtCantidad.setHorizontalAlignment(JTextField.CENTER);
         
-        btnAgregar = crearBotonPrimario("AGREGAR AL PEDIDO", 180);
+        btnAgregar = crearBotonAgregar("AGREGAR AL PEDIDO", 180);
         btnAgregar.addActionListener(e -> agregarPlatoAlPedido());
         
-        fila2.add(lblPlatillo);
-        fila2.add(cmbPlatillo);
+        fila2.add(lblPlato);
+        fila2.add(cmbPlato);
         fila2.add(Box.createHorizontalStrut(20));
         fila2.add(lblCantidad);
         fila2.add(txtCantidad);
@@ -353,10 +329,9 @@ public class PedidoFrame extends JFrame {
             "DETALLES DEL PEDIDO ACTUAL"
         ));
         
-        
         modelPedido = new DefaultTableModel(
             new Object[][]{},
-            new String[]{"Platillo", "Cantidad", "Precio Unitario", "Subtotal"}
+            new String[]{"Plato", "Cantidad", "Precio Unitario", "Subtotal"}
         ) {
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -368,7 +343,6 @@ public class PedidoFrame extends JFrame {
         tblPedido.setRowHeight(25);
         tblPedido.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         
-        // CONFIGURAR ANCHOS DE COLUMNAS
         tblPedido.getColumnModel().getColumn(0).setPreferredWidth(250);
         tblPedido.getColumnModel().getColumn(1).setPreferredWidth(80);
         tblPedido.getColumnModel().getColumn(2).setPreferredWidth(120);
@@ -382,6 +356,108 @@ public class PedidoFrame extends JFrame {
         return panel;
     }
     
+    private JButton crearBotonAgregar(String texto, int ancho) {
+        JButton boton = new JButton(texto);
+        boton.setBackground(new Color(34, 139, 34));
+        boton.setForeground(Color.BLACK);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(0, 100, 0), 2),
+            BorderFactory.createEmptyBorder(12, 20, 12, 20)
+        ));
+        boton.setPreferredSize(new Dimension(ancho, 45));
+        
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                boton.setBackground(new Color(50, 205, 50));
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(0, 100, 0), 3),
+                    BorderFactory.createEmptyBorder(12, 20, 12, 20)
+                ));
+                boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                boton.setBackground(new Color(34, 139, 34));
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(0, 100, 0), 2),
+                    BorderFactory.createEmptyBorder(12, 20, 12, 20)
+                ));
+                boton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+        
+        return boton;
+    }
+    
+    private JButton crearBotonEnviarCocina(String texto, int ancho) {
+        JButton boton = new JButton(texto);
+        boton.setBackground(new Color(30, 144, 255));
+        boton.setForeground(Color.BLACK);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(0, 0, 139), 2),
+            BorderFactory.createEmptyBorder(12, 20, 12, 20)
+        ));
+        boton.setPreferredSize(new Dimension(ancho, 45));
+        
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                boton.setBackground(new Color(70, 130, 180));
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(0, 0, 139), 3),
+                    BorderFactory.createEmptyBorder(12, 20, 12, 20)
+                ));
+                boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                boton.setBackground(new Color(30, 144, 255));
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(0, 0, 139), 2),
+                    BorderFactory.createEmptyBorder(12, 20, 12, 20)
+                ));
+                boton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+        
+        return boton;
+    }
+    
+    private JButton crearBotonCobrar(String texto, int ancho) {
+        JButton boton = new JButton(texto);
+        boton.setBackground(new Color(46, 204, 113));
+        boton.setForeground(Color.BLACK);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(39, 174, 96), 2),
+            BorderFactory.createEmptyBorder(12, 20, 12, 20)
+        ));
+        boton.setPreferredSize(new Dimension(ancho, 45));
+        
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                boton.setBackground(new Color(88, 214, 141));
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(39, 174, 96), 3),
+                    BorderFactory.createEmptyBorder(12, 20, 12, 20)
+                ));
+                boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                boton.setBackground(new Color(46, 204, 113));
+                boton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(39, 174, 96), 2),
+                    BorderFactory.createEmptyBorder(12, 20, 12, 20)
+                ));
+                boton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+        
+        return boton;
+    }
+    
     private JButton crearBotonPrimario(String texto, int ancho) {
         JButton boton = new JButton(texto);
         boton.setBackground(COLOR_ACENTO);
@@ -393,7 +469,6 @@ public class PedidoFrame extends JFrame {
             BorderFactory.createEmptyBorder(12, 20, 12, 20)
         ));
         boton.setPreferredSize(new Dimension(ancho, 45));
-        
         
         boton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -450,7 +525,6 @@ public class PedidoFrame extends JFrame {
         return boton;
     }
     
-   
     private void cargarDatos() {
         mesas = mesaDAO.obtenerMesasDisponibles();
         cmbMesa.removeAllItems();
@@ -459,14 +533,19 @@ public class PedidoFrame extends JFrame {
             cmbMesa.addItem("M" + mesa.getNumero());
         }
         
-        platillos = platilloDAO.obtenerPlatillosDisponibles();
-        cmbPlatillo.removeAllItems();
-        for (Plato plato : platillos) {
-            cmbPlatillo.addItem(plato.getNombre() + " - S/" + plato.getPrecio());
+        platos = platoDAO.obtenerPlatosDisponibles();
+        cmbPlato.removeAllItems();
+        
+        if (platos != null) {
+            for (Plato plato : platos) {
+                cmbPlato.addItem(plato.getNombre() + " - S/" + plato.getPrecio());
+            }
+        } else {
+            cmbPlato.addItem("No hay platos disponibles");
         }
         
         if (cmbMesa.getItemCount() > 0) cmbMesa.setSelectedIndex(0);
-        if (cmbPlatillo.getItemCount() > 0) cmbPlatillo.setSelectedIndex(0);
+        if (cmbPlato.getItemCount() > 0) cmbPlato.setSelectedIndex(0);
     }
     
     private void initTablaPedido() {
@@ -474,22 +553,22 @@ public class PedidoFrame extends JFrame {
         actualizarTotal();
     }
     
-    
     private void cargarPedidosListos() {
         if (modelPedidosListos != null) {
             modelPedidosListos.setRowCount(0);
             pedidosListos = pedidoDAO.obtenerPedidosListosParaCobrar();
             
-            for (Pedido pedido : pedidosListos) {
-                modelPedidosListos.addRow(new Object[]{
-                    "PED-" + pedido.getIdPedido(),
-                    "M" + pedido.getMesa().getNumero(),
-                    String.format("S/%.2f", pedido.calcularTotal())
-                    
-                });
+            if (pedidosListos != null) {
+                for (Pedido pedido : pedidosListos) {
+                    modelPedidosListos.addRow(new Object[]{
+                        "PED-" + pedido.getIdPedido(),
+                        "M" + pedido.getMesa().getNumero(),
+                        String.format("S/%.2f", pedido.calcularTotal())
+                    });
+                }
             }
             
-            if (pedidosListos.size() > 0) {
+            if (pedidosListos != null && pedidosListos.size() > 0) {
                 tabbedPane.setTitleAt(1, "PEDIDOS LISTOS PARA COBRAR (" + pedidosListos.size() + ")");
             } else {
                 tabbedPane.setTitleAt(1, "PEDIDOS LISTOS PARA COBRAR");
@@ -502,10 +581,10 @@ public class PedidoFrame extends JFrame {
             if (!crearNuevoPedido()) return;
         }
         
-        int selectedIndex = cmbPlatillo.getSelectedIndex();
-        if (selectedIndex >= 0 && selectedIndex < platillos.size()) {
+        int selectedIndex = cmbPlato.getSelectedIndex();
+        if (selectedIndex >= 0 && platos != null && selectedIndex < platos.size()) {
             try {
-                Plato plato = platillos.get(selectedIndex);
+                Plato platoSeleccionado = platos.get(selectedIndex);
                 int cantidad = Integer.parseInt(txtCantidad.getText().trim());
                 
                 if (cantidad <= 0) {
@@ -513,16 +592,16 @@ public class PedidoFrame extends JFrame {
                     return;
                 }
                 
-                boolean exito = pedidoDAO.agregarPlatoAPedido(idOrdenActual, plato.getIdPlato(), cantidad);
+                boolean exito = pedidoDAO.agregarPlatoAPedido(idOrdenActual, platoSeleccionado.getIdPlato(), cantidad);
                 
                 if (exito) {
-                    double subtotal = plato.getPrecio() * cantidad;
+                    double subtotal = platoSeleccionado.getPrecio() * cantidad;
                     totalPedido += subtotal;
                     
                     modelPedido.addRow(new Object[]{
-                        plato.getNombre(),
+                        platoSeleccionado.getNombre(),
                         cantidad,
-                        String.format("S/%.2f", plato.getPrecio()),
+                        String.format("S/%.2f", platoSeleccionado.getPrecio()),
                         String.format("S/%.2f", subtotal)
                     });
                     
@@ -530,16 +609,18 @@ public class PedidoFrame extends JFrame {
                     txtCantidad.setText("1");
                     
                     JOptionPane.showMessageDialog(this, 
-                        "Platillo agregado al pedido #" + idOrdenActual);
+                        "Plato agregado al pedido #" + idOrdenActual);
                 } else {
-                    JOptionPane.showMessageDialog(this, "Error al agregar platillo");
+                    JOptionPane.showMessageDialog(this, "Error al agregar plato al pedido");
                 }
                 
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "La cantidad debe ser un numero valido");
+                JOptionPane.showMessageDialog(this, "La cantidad debe ser un número válido");
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
             }
         } else {
-            JOptionPane.showMessageDialog(this, "Seleccione un platillo valido");
+            JOptionPane.showMessageDialog(this, "Seleccione un plato válido");
         }
     }
     
@@ -558,7 +639,8 @@ public class PedidoFrame extends JFrame {
             String mesaSeleccionada = cmbMesa.getSelectedItem().toString();
             int idMesa = Integer.parseInt(mesaSeleccionada.replace("M", ""));
             
-            idOrdenActual = pedidoDAO.crearPedido(idMesa);
+           String nombreCliente = txtCliente.getText().trim();
+           idOrdenActual = pedidoDAO.crearPedido(idMesa, nombreCliente);
             
             if (idOrdenActual != -1) {
                 mesaDAO.actualizarEstadoMesa(idMesa, "ocupada");
@@ -580,7 +662,6 @@ public class PedidoFrame extends JFrame {
         }
     }
     
-    
     private void enviarPedidoACocina() {
         if (idOrdenActual == -1) {
             JOptionPane.showMessageDialog(this, "No hay un pedido activo para enviar a cocina");
@@ -588,7 +669,7 @@ public class PedidoFrame extends JFrame {
         }
         
         if (modelPedido.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(this, "Agregue platillos al pedido antes de enviar a cocina");
+            JOptionPane.showMessageDialog(this, "Agregue platos al pedido antes de enviar a cocina");
             return;
         }
         
@@ -605,7 +686,7 @@ public class PedidoFrame extends JFrame {
             if (pedidoDAO.enviarACocina(idOrdenActual)) {
                 JOptionPane.showMessageDialog(this, 
                     "Pedido #" + idOrdenActual + " enviado a cocina exitosamente\n" +
-                    "El chef recibirá el pedido y lo preparara");
+                    "El chef recibirá el pedido y lo preparará");
                 
                 limpiarPedido();
                 cargarDatos();
@@ -632,8 +713,8 @@ public class PedidoFrame extends JFrame {
     
     private void cerrarSesion() {
         int respuesta = JOptionPane.showConfirmDialog(this,
-            "¿Está seguro de cerrar sesion?",
-            "Cerrar Sesion",
+            "¿Está seguro de cerrar sesión?",
+            "Cerrar Sesión",
             JOptionPane.YES_NO_OPTION);
         
         if (respuesta == JOptionPane.YES_OPTION) {

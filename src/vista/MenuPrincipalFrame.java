@@ -90,14 +90,14 @@ public class MenuPrincipalFrame extends JFrame {
         panel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
         
         
-        JButton btnPlatillos = crearBotonPrimario("GESTION DE PLATILLOS");
+        JButton btnPlatos = crearBotonPrimario("GESTION DE PLATILLOS");
         JButton btnUsuarios = crearBotonPrimario("GESTION DE USUARIOS");
         JButton btnReportes = crearBotonPrimario("REPORTES Y ESTADISTICAS");
         JButton btnInventario = crearBotonPrimario("CONTROL DE INVENTARIO");
         
         
-        btnPlatillos.addActionListener(e -> {
-            GestionPlatillosFrame gestionFrame = new GestionPlatillosFrame();
+        btnPlatos.addActionListener(e -> {
+            GestionPlatosFrame gestionFrame = new GestionPlatosFrame();
             gestionFrame.setVisible(true);
         });
         
@@ -114,7 +114,7 @@ public class MenuPrincipalFrame extends JFrame {
             inventarioFrame.setVisible(true);
         });
         
-        panel.add(btnPlatillos);
+        panel.add(btnPlatos);
         panel.add(btnUsuarios);
         panel.add(btnReportes);
         panel.add(btnInventario);

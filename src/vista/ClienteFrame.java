@@ -1,5 +1,6 @@
 package vista;
 
+import util.DatosSesion;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -40,7 +41,7 @@ public class ClienteFrame extends JFrame {
 
     private void cargarPedidos() {
         modeloPedidos.setRowCount(0);
-        ArrayList<String[]> pedidos = DatosCompartidos.obtenerPedidos();
+        ArrayList<String[]> pedidos = DatosSesion.obtenerPedidos();
         int i = 1;
         for (String[] p : pedidos) {
             modeloPedidos.addRow(new Object[]{i++, p[0], p[1], p[2]});

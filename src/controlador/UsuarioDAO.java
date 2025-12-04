@@ -7,9 +7,7 @@ import java.util.List;
 
 public class UsuarioDAO {
     
-    
     public Usuario validarUsuario(String username, String password) {
-        
         String sql = "SELECT id_usuario, username, rol FROM usuarios WHERE username = ? AND password = ? AND estado = true";
         
         try (Connection conn = DatabaseConnection.getConnection();
@@ -23,7 +21,18 @@ public class UsuarioDAO {
                     Usuario usuario = new Usuario();
                     usuario.setIdUsuario(rs.getInt("id_usuario"));
                     usuario.setUsername(rs.getString("username"));
-                    usuario.setRol(rs.getString("rol"));
+                    String rolBD = rs.getString("rol");
+                    
+                    if ("cocinero".equals(rolBD)) {
+                        usuario.setRol("cocinero");
+                    } else if ("mesero".equals(rolBD)) {
+                        usuario.setRol("mesero");
+                    } else if ("admin".equals(rolBD)) {
+                        usuario.setRol("admin");
+                    } else {
+                        usuario.setRol(rolBD);
+                    }
+                    
                     return usuario;
                 }
             }
@@ -33,7 +42,6 @@ public class UsuarioDAO {
         }
         return null;
     }
-
 
     public List<Usuario> obtenerTodosUsuarios() {
         List<Usuario> usuarios = new ArrayList<>();
@@ -49,7 +57,18 @@ public class UsuarioDAO {
                 usuario.setIdUsuario(rs.getInt("id_usuario"));
                 usuario.setUsername(rs.getString("username"));
                 usuario.setPassword(rs.getString("password")); 
-                usuario.setRol(rs.getString("rol"));
+                
+                String rolBD = rs.getString("rol");
+                if ("cocinero".equals(rolBD)) {
+                    usuario.setRol("cocinero");
+                } else if ("mesero".equals(rolBD)) {
+                    usuario.setRol("mesero");
+                } else if ("admin".equals(rolBD)) {
+                    usuario.setRol("admin");
+                } else {
+                    usuario.setRol(rolBD);
+                }
+                
                 usuarios.add(usuario);
             }
         } catch (SQLException e) {
@@ -58,10 +77,8 @@ public class UsuarioDAO {
         }
         return usuarios;
     }
-
     
     public boolean agregarUsuario(Usuario usuario) {
-        
         String sql = "INSERT INTO usuarios (username, password, rol, estado) VALUES (?, ?, ?, true)";
         
         try (Connection conn = DatabaseConnection.getConnection();
@@ -69,18 +86,29 @@ public class UsuarioDAO {
             
             pstmt.setString(1, usuario.getUsername());
             pstmt.setString(2, usuario.getPassword());
-            pstmt.setString(3, usuario.getRol());
+            
+            String rolJava = usuario.getRol();
+            String rolBD;
+            if ("cocinero".equals(rolJava)) {
+                rolBD = "cocinero";
+            } else if ("mesero".equals(rolJava)) {
+                rolBD = "mesero";
+            } else if ("admin".equals(rolJava)) {
+                rolBD = "admin";
+            } else {
+                rolBD = rolJava;
+            }
+            
+            pstmt.setString(3, rolBD);
             
             int filasAfectadas = pstmt.executeUpdate();
             return filasAfectadas > 0;
         } catch (SQLException e) {
-            
             System.out.println("❌ ERROR SQL en agregarUsuario: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
-
     
     public boolean actualizarUsuario(Usuario usuario) {
         String sql = "UPDATE usuarios SET username = ?, password = ?, rol = ? WHERE id_usuario = ?";
@@ -90,7 +118,20 @@ public class UsuarioDAO {
             
             pstmt.setString(1, usuario.getUsername());
             pstmt.setString(2, usuario.getPassword());
-            pstmt.setString(3, usuario.getRol());
+            
+            String rolJava = usuario.getRol();
+            String rolBD;
+            if ("cocinero".equals(rolJava)) {
+                rolBD = "cocinero";
+            } else if ("mesero".equals(rolJava)) {
+                rolBD = "mesero";
+            } else if ("admin".equals(rolJava)) {
+                rolBD = "admin";
+            } else {
+                rolBD = rolJava;
+            }
+            
+            pstmt.setString(3, rolBD);
             pstmt.setInt(4, usuario.getIdUsuario());
             
             int filasAfectadas = pstmt.executeUpdate();
@@ -101,10 +142,8 @@ public class UsuarioDAO {
             return false;
         }
     }
-
     
     public boolean eliminarUsuario(int idUsuario) {
-        
         String sql = "UPDATE usuarios SET estado = false WHERE id_usuario = ?";
         
         try (Connection conn = DatabaseConnection.getConnection();

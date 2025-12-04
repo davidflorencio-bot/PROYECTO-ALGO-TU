@@ -146,32 +146,32 @@ public class ReporteDAO {
     }
     
     
-    public List<Object[]> obtenerPlatillosMasVendidos() {
-        List<Object[]> platillos = new ArrayList<>();
-        String sql = "SELECT p.nombre, SUM(d.cantidad) as total_vendido, " +
-                    "SUM(d.cantidad * d.precio_unitario) as ingresos " +
-                    "FROM detalle_orden d " +
-                    "JOIN platillos p ON d.id_platillo = p.id_platillo " +
-                    "JOIN ordenes o ON d.id_orden = o.id_orden " +
-                    "WHERE o.estado = 'cobrado' " +
-                    "GROUP BY p.id_platillo, p.nombre " +
-                    "ORDER BY total_vendido DESC " +
-                    "LIMIT 10";
+    public List<Object[]> obtenerPlatosMasVendidos() {
+    List<Object[]> platillos = new ArrayList<>();
+    String sql = "SELECT p.nombre, SUM(d.cantidad) as total_vendido, " +
+                "SUM(d.cantidad * d.precio_unitario) as ingresos " +
+                "FROM detalle_orden d " +
+                "JOIN platos p ON d.id_plato = p.id_plato " +  // ✅ CORREGIDO
+                "JOIN ordenes o ON d.id_orden = o.id_orden " +
+                "WHERE o.estado = 'cobrado' " +
+                "GROUP BY p.id_plato, p.nombre " +  // ✅ CORREGIDO
+                "ORDER BY total_vendido DESC " +
+                "LIMIT 10";
+    
+    try (Connection conn = DatabaseConnection.getConnection();
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery(sql)) {
         
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            
-            while (rs.next()) {
-                Object[] platillo = {
-                    rs.getString("nombre"),
-                    rs.getInt("total_vendido"),
-                    rs.getDouble("ingresos")
-                };
-                platillos.add(platillo);
-            }
+        while (rs.next()) {
+            Object[] platillo = {
+                rs.getString("nombre"),
+                rs.getInt("total_vendido"),
+                rs.getDouble("ingresos")
+            };
+            platillos.add(platillo);
+        }
         } catch (SQLException e) {
-            e.printStackTrace();
+        e.printStackTrace();
         }
         return platillos;
     }

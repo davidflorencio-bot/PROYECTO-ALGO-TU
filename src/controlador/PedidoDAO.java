@@ -11,12 +11,13 @@ import java.util.List;
 
 public class PedidoDAO {
     
-    public int crearPedido(int idMesa) {
-        String sql = "INSERT INTO ordenes (id_mesa, estado, total) VALUES (?, 'pendiente', 0)";
+    public int crearPedido(int idMesa, String nombreCliente) {
+        String sql = "INSERT INTO ordenes (id_mesa, nombre_cliente, estado, total) VALUES (?, ?, 'pendiente', 0)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
             pstmt.setInt(1, idMesa);
+            pstmt.setString(2, nombreCliente);
             pstmt.executeUpdate();
             
             ResultSet rs = pstmt.getGeneratedKeys();
@@ -29,26 +30,25 @@ public class PedidoDAO {
         return -1;
     }
     
-    public boolean agregarPlatoAPedido(int idOrden, int idPlatillo, int cantidad) {
+    public boolean agregarPlatoAPedido(int idOrden, int idPlato, int cantidad) {
         
-        double precio = obtenerPrecioPlatillo(idPlatillo);
+        double precio = obtenerPrecioPlato(idPlato);
         if (precio == -1) return false;
         
         double subtotal = precio * cantidad;
         
-        String sql = "INSERT INTO detalle_orden (id_orden, id_platillo, cantidad, precio_unitario, subtotal) " +
+        String sql = "INSERT INTO detalle_orden (id_orden, id_plato, cantidad, precio_unitario, subtotal) " +
                     "VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setInt(1, idOrden);
-            pstmt.setInt(2, idPlatillo);
+            pstmt.setInt(2, idPlato);
             pstmt.setInt(3, cantidad);
             pstmt.setDouble(4, precio);
             pstmt.setDouble(5, subtotal);
             
             boolean resultado = pstmt.executeUpdate() > 0;
-            
             
             if (resultado) {
                 actualizarTotalPedido(idOrden);
@@ -62,12 +62,12 @@ public class PedidoDAO {
         return false;
     }
     
-    private double obtenerPrecioPlatillo(int idPlatillo) {
-        String sql = "SELECT precio FROM platillos WHERE id_platillo = ?";
+    private double obtenerPrecioPlato(int idPlato) {
+        String sql = "SELECT precio FROM platos WHERE id_plato = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
-            pstmt.setInt(1, idPlatillo);
+            pstmt.setInt(1, idPlato);
             ResultSet rs = pstmt.executeQuery();
             
             if (rs.next()) {
@@ -96,7 +96,6 @@ public class PedidoDAO {
         }
     }
     
-    
     public boolean enviarACocina(int idOrden) {
         String sql = "UPDATE ordenes SET estado = 'en_cocina' WHERE id_orden = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -111,7 +110,6 @@ public class PedidoDAO {
         return false;
     }
     
-    
     public boolean cobrarPedido(int idOrden) {
         String sql = "UPDATE ordenes SET estado = 'cobrado' WHERE id_orden = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -119,7 +117,6 @@ public class PedidoDAO {
             
             pstmt.setInt(1, idOrden);
             boolean resultado = pstmt.executeUpdate() > 0;
-            
             
             if (resultado) {
                 liberarMesa(idOrden);
@@ -133,60 +130,60 @@ public class PedidoDAO {
         return false;
     }
     
-    
     public List<Pedido> obtenerPedidosParaCocina() {
-        List<Pedido> pedidos = new ArrayList<>();
-        String sql = "SELECT o.id_orden, o.estado, o.total, m.numero_mesa " +
-                    "FROM ordenes o JOIN mesas m ON o.id_mesa = m.id_mesa " +
-                    "WHERE o.estado IN ('pendiente', 'en_cocina') " +
-                    "ORDER BY o.fecha_creacion";
+    List<Pedido> pedidos = new ArrayList<>();
+    String sql = "SELECT o.id_orden, o.estado, o.total, m.numero_mesa, o.nombre_cliente " +  // ✅ CORREGIDO
+                "FROM ordenes o JOIN mesas m ON o.id_mesa = m.id_mesa " +
+                "WHERE o.estado IN ('pendiente', 'en_cocina') " +
+                "ORDER BY o.fecha_creacion";
+    
+    try (Connection conn = DatabaseConnection.getConnection();
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery(sql)) {
         
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        while (rs.next()) {
+            int idOrden = rs.getInt("id_orden");
+            String estado = rs.getString("estado");
+            double total = rs.getDouble("total");
+            String numeroMesa = rs.getString("numero_mesa");  // ✅ numero_mesa
+            String nombreCliente = rs.getString("nombre_cliente");
             
-            while (rs.next()) {
-                int idOrden = rs.getInt("id_orden");
-                String estado = rs.getString("estado");
-                double total = rs.getDouble("total");
-                String numeroMesa = rs.getString("numero_mesa");
-                
-                Pedido pedido = crearPedidoDesdeBD(idOrden, estado, numeroMesa);
-                if (pedido != null) {
-                    pedidos.add(pedido);
+            Pedido pedido = crearPedidoDesdeBD(idOrden, estado, numeroMesa, nombreCliente);
+            if (pedido != null) {
+                pedidos.add(pedido);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+        e.printStackTrace();
         }
-        return pedidos;
+    return pedidos;
     }
     
-    
     public List<Pedido> obtenerPedidosListosParaCobrar() {
-        List<Pedido> pedidos = new ArrayList<>();
-        String sql = "SELECT o.id_orden, o.estado, o.total, m.numero_mesa " +
-                    "FROM ordenes o JOIN mesas m ON o.id_mesa = m.id_mesa " +
-                    "WHERE o.estado = 'listo' " +
-                    "ORDER BY o.fecha_creacion";
+    List<Pedido> pedidos = new ArrayList<>();
+    String sql = "SELECT o.id_orden, o.estado, o.total, m.numero_mesa, o.nombre_cliente " +  
+                "FROM ordenes o JOIN mesas m ON o.id_mesa = m.id_mesa " +
+                "WHERE o.estado = 'listo' " +
+                "ORDER BY o.fecha_creacion";
+    
+    try (Connection conn = DatabaseConnection.getConnection();
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery(sql)) {
         
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        while (rs.next()) {
+            int idOrden = rs.getInt("id_orden");
+            String estado = rs.getString("estado");
+            double total = rs.getDouble("total");
+            String numeroMesa = rs.getString("numero_mesa");  
+            String nombreCliente = rs.getString("nombre_cliente");
             
-            while (rs.next()) {
-                int idOrden = rs.getInt("id_orden");
-                String estado = rs.getString("estado");
-                double total = rs.getDouble("total");
-                String numeroMesa = rs.getString("numero_mesa");
-                
-                Pedido pedido = crearPedidoDesdeBD(idOrden, estado, numeroMesa);
-                if (pedido != null) {
-                    pedidos.add(pedido);
+            Pedido pedido = crearPedidoDesdeBD(idOrden, estado, numeroMesa, nombreCliente);
+            if (pedido != null) {
+                pedidos.add(pedido);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+        e.printStackTrace();
         }
         return pedidos;
     }
@@ -210,7 +207,7 @@ public class PedidoDAO {
         List<Object[]> detalles = new ArrayList<>();
         String sql = "SELECT p.nombre, d.cantidad, d.precio_unitario as precio " +
                     "FROM detalle_orden d " +
-                    "JOIN platillos p ON d.id_platillo = p.id_platillo " +
+                    "JOIN platos p ON d.id_plato = p.id_plato " +
                     "WHERE d.id_orden = ?";
         
         try (Connection conn = DatabaseConnection.getConnection();
@@ -248,18 +245,16 @@ public class PedidoDAO {
         return false;
     }
     
-    
     public boolean finalizarPedido(int idOrden) {
-        
         System.out.println("⚠️ ADVERTENCIA: finalizarPedido() está deprecado. Usar enviarACocina() o cobrarPedido()");
         return false;
     }
     
-    private Pedido crearPedidoDesdeBD(int idOrden, String estado, String numeroMesa) {
+    private Pedido crearPedidoDesdeBD(int idOrden, String estado, String numeroMesa, String nombreCliente) {
         try {
             int numero = Integer.parseInt(numeroMesa.replace("M", ""));
             Mesa mesa = new Mesa(0, numero, 4);
-            Cliente cliente = new Cliente(0, "Cliente", "00000000", "presencial");
+            Cliente cliente = new Cliente(0, nombreCliente != null ? nombreCliente : "Cliente", "00000000", "presencial");
             Mesero mesero = new Mesero(0, "Mesero", "turno");
             
             Pedido pedido = new Pedido(cliente, mesero, mesa);
@@ -276,8 +271,8 @@ public class PedidoDAO {
     }
     
     private void cargarPlatosDelPedido(Pedido pedido, int idOrden) {
-        String sql = "SELECT p.id_platillo, p.nombre, p.precio, d.cantidad " +
-                    "FROM detalle_orden d JOIN platillos p ON d.id_platillo = p.id_platillo " +
+        String sql = "SELECT p.id_plato, p.nombre, p.precio, d.cantidad " +
+                    "FROM detalle_orden d JOIN platos p ON d.id_plato = p.id_plato " +
                     "WHERE d.id_orden = ?";
         
         try (Connection conn = DatabaseConnection.getConnection();
@@ -288,7 +283,7 @@ public class PedidoDAO {
             
             while (rs.next()) {
                 Plato plato = new Plato(
-                    rs.getInt("id_platillo"),
+                    rs.getInt("id_plato"),
                     rs.getString("nombre"),
                     rs.getDouble("precio"),
                     "General"

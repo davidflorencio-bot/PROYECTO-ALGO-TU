@@ -12,8 +12,8 @@ import java.util.List;
 
 public class ReportesFrame extends JFrame {
     private ReporteDAO reporteDAO;
-    private DefaultTableModel modelVentas, modelPlatillos;
-    private JTable tblVentas, tblPlatillos;
+    private DefaultTableModel modelVentas, modelPlatos;
+    private JTable tblVentas, tblPlatos;
     private JTextField txtFechaInicio, txtFechaFin;
     private JLabel lblTotalVentas, lblTotalPedidos, lblVentasHoy, lblPedidosPendientes, lblGananciasHoy;
     
@@ -55,7 +55,7 @@ public class ReportesFrame extends JFrame {
         tabbedPane.addTab("VENTAS POR FECHA", crearPanelVentas());
         
         
-        tabbedPane.addTab("PLATILLOS POPULARES", crearPanelPlatillos());
+        tabbedPane.addTab("PLATILLOS POPULARES", crearPanelPlatos());
         
         panelPrincipal.add(tabbedPane, BorderLayout.CENTER);
         
@@ -216,7 +216,7 @@ public class ReportesFrame extends JFrame {
         return panel;
     }
     
-    private JPanel crearPanelPlatillos() {
+    private JPanel crearPanelPlatos() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -230,25 +230,25 @@ public class ReportesFrame extends JFrame {
         ));
         
         JButton btnActualizar = crearBotonSecundario("ACTUALIZAR LISTA");
-        btnActualizar.addActionListener(e -> cargarPlatillosPopulares());
+        btnActualizar.addActionListener(e -> cargarPlatosPopulares());
         panelSuperior.add(btnActualizar);
         
     
-        modelPlatillos = new DefaultTableModel(
+        modelPlatos = new DefaultTableModel(
             new Object[][]{},
-            new String[]{"Platillo", "Cantidad Vendida", "Ingresos Generados"}
+            new String[]{"Plato", "Cantidad Vendida", "Ingresos Generados"}
         ) {
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
         
-        tblPlatillos = new JTable(modelPlatillos);
-        tblPlatillos.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        tblPlatillos.setRowHeight(25);
-        tblPlatillos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        tblPlatos = new JTable(modelPlatos);
+        tblPlatos.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        tblPlatos.setRowHeight(25);
+        tblPlatos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         
-        JScrollPane scrollPane = new JScrollPane(tblPlatillos);
+        JScrollPane scrollPane = new JScrollPane(tblPlatos);
         
         panel.add(panelSuperior, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
@@ -315,7 +315,7 @@ public class ReportesFrame extends JFrame {
     }
     
     private void cargarDatosIniciales() {
-        cargarPlatillosPopulares();
+        cargarPlatosPopulares();
     }
     
     private void generarReporteVentas() {
@@ -430,11 +430,11 @@ public class ReportesFrame extends JFrame {
         }
     }
     
-    private void cargarPlatillosPopulares() {
+    private void cargarPlatosPopulares() {
         if (reporteDAO == null) return;
         
-        modelPlatillos.setRowCount(0);
-        List<Object[]> platillos = reporteDAO.obtenerPlatillosMasVendidos();
+        modelPlatos.setRowCount(0);
+        List<Object[]> platillos = reporteDAO.obtenerPlatosMasVendidos();
         
         if (platillos.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No hay datos de platillos vendidos");
@@ -444,7 +444,7 @@ public class ReportesFrame extends JFrame {
         double totalIngresos = 0;
         
         for (Object[] platillo : platillos) {
-            modelPlatillos.addRow(new Object[]{
+            modelPlatos.addRow(new Object[]{
                 platillo[0], 
                 platillo[1], 
                 "S/" + String.format("%.2f", platillo[2]) 
@@ -453,7 +453,7 @@ public class ReportesFrame extends JFrame {
         }
         
         
-        modelPlatillos.addRow(new Object[]{
+        modelPlatos.addRow(new Object[]{
             "TOTAL GENERAL",
             "",
             "S/" + String.format("%.2f", totalIngresos)

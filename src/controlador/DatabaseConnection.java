@@ -11,7 +11,7 @@ public class DatabaseConnection {
     
     public static Connection getConnection() {
         try {
-            System.out.println("=== INTENTANDO CONEXIÓN BD ===");
+            System.out.println("=== INTENTANDO CONEXION BD ===");
             Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
             System.out.println(" CONEXION BD EXITOSA");
             return conn;

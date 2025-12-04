@@ -1,10 +1,10 @@
-package vista;
+package util;
 
 import java.util.ArrayList;
 import modelo.Usuario;
 import modelo.Plato;
 
-public class DatosCompartidos {
+public class DatosSesion {
 
      public static Usuario usuarioLogueado;
     
