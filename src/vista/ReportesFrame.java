@@ -417,13 +417,13 @@ public class ReportesFrame extends JFrame {
             
             // Mensaje de éxito
             JOptionPane.showMessageDialog(this,
-                "✅ Reporte exportado exitosamente a:\n" + archivo.getAbsolutePath(),
+                " Reporte exportado exitosamente a:\n" + archivo.getAbsolutePath(),
                 "Exportación completada",
                 JOptionPane.INFORMATION_MESSAGE);
                 
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this,
-                "❌ Error al exportar el reporte:\n" + e.getMessage(),
+                " Error al exportar el reporte:\n" + e.getMessage(),
                 "Error de exportación",
                 JOptionPane.ERROR_MESSAGE);
             }

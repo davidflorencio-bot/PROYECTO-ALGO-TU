@@ -340,7 +340,7 @@ public class PedidosPendientesFrame extends JFrame {
             
             modelPedidos.addRow(new Object[]{
                 "PED-" + pedido.getIdPedido(),
-                "M" + pedido.getMesa().getNumero(),
+                "M" + pedido.getNumeroMesa(),
                 estadoMostrar,
                 String.format("S/%.2f", pedido.calcularTotal()),
                 platos,
@@ -392,7 +392,7 @@ public class PedidosPendientesFrame extends JFrame {
                 if ("en_cocina".equals(estado)) {
                     mensaje = "Pedido marcado como EN PREPARACION";
                 } else if ("listo".equals(estado)) {
-                    mensaje = "✅ Pedido marcado como LISTO\nEl mesero podra cobrarlo";
+                    mensaje = " Pedido marcado como LISTO\nEl mesero podra cobrarlo";
                 }
                 
                 JOptionPane.showMessageDialog(this, mensaje);

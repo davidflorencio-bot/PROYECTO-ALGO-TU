@@ -7,14 +7,14 @@ public class SistemaRestaurante {
     public static void main(String[] args) {
         System.out.println("=== INICIANDO SISTEMA RESTAURANTE ===");
         
-        // Configurar look and feel
+        
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
         }
         
-        // Ejecutar en el hilo de EDT
+      
         SwingUtilities.invokeLater(() -> {
             LoginFrame login = new LoginFrame();
             login.setVisible(true);

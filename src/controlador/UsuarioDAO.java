@@ -37,7 +37,7 @@ public class UsuarioDAO {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("❌ ERROR SQL en validarUsuario: " + e.getMessage());
+            System.out.println(" ERROR SQL en validarUsuario: " + e.getMessage());
             e.printStackTrace();
         }
         return null;
@@ -72,7 +72,7 @@ public class UsuarioDAO {
                 usuarios.add(usuario);
             }
         } catch (SQLException e) {
-            System.out.println("❌ ERROR SQL en obtenerTodosUsuarios: " + e.getMessage());
+            System.out.println("ERROR SQL en obtenerTodosUsuarios: " + e.getMessage());
             e.printStackTrace();
         }
         return usuarios;
@@ -104,7 +104,7 @@ public class UsuarioDAO {
             int filasAfectadas = pstmt.executeUpdate();
             return filasAfectadas > 0;
         } catch (SQLException e) {
-            System.out.println("❌ ERROR SQL en agregarUsuario: " + e.getMessage());
+            System.out.println(" ERROR SQL en agregarUsuario: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -137,7 +137,7 @@ public class UsuarioDAO {
             int filasAfectadas = pstmt.executeUpdate();
             return filasAfectadas > 0;
         } catch (SQLException e) {
-            System.out.println("❌ ERROR SQL en actualizarUsuario: " + e.getMessage());
+            System.out.println(" ERROR SQL en actualizarUsuario: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -154,7 +154,7 @@ public class UsuarioDAO {
             int filasAfectadas = pstmt.executeUpdate();
             return filasAfectadas > 0;
         } catch (SQLException e) {
-            System.out.println("❌ ERROR SQL en eliminarUsuario: " + e.getMessage());
+            System.out.println(" ERROR SQL en eliminarUsuario: " + e.getMessage());
             e.printStackTrace();
             return false;
         }

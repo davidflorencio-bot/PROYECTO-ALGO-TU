@@ -25,4 +25,5 @@ public class Inventario {
     
     public double getMinimo() { return minimo; }
     public void setMinimo(double minimo) { this.minimo = minimo; }
+ 
 }

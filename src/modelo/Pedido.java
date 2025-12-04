@@ -8,22 +8,44 @@ public class Pedido {
     private Date fecha;
     private String estado;
     private ArrayList<Plato> platos;
-    private Cliente cliente;
-    private Mesero mesero;
-    private Mesa mesa;
+  
+ 
+    private String nombreCliente;
+    private String nombreMesero;
+    private int numeroMesa;
+    private int capacidadMesa;
 
     private static int contador = 1;
 
-    public Pedido(Cliente cliente, Mesero mesero, Mesa mesa) {
+    public Pedido(String nombreCliente, String nombreMesero, int numeroMesa, int capacidadMesa) {
         this.idPedido = contador++;
         this.fecha = new Date();
         this.estado = "En preparación";
         this.platos = new ArrayList<>();
-        this.cliente = cliente;
-        this.mesero = mesero;
-        this.mesa = mesa;
+        this.nombreCliente = nombreCliente;
+        this.nombreMesero = nombreMesero;
+        this.numeroMesa = numeroMesa;
+        this.capacidadMesa = capacidadMesa;
     }
 
+    
+    public String getNombreCliente() {
+        return nombreCliente;
+    }
+    
+    public String getNombreMesero() {
+        return nombreMesero;
+    }
+    
+    public int getNumeroMesa() {
+        return numeroMesa;
+    }
+    
+    public int getCapacidadMesa() {
+        return capacidadMesa;
+    }
+    
+    
     public int getIdPedido() {
         return idPedido;
     }
@@ -42,7 +64,7 @@ public class Pedido {
 
     public void agregarPlato(Plato p) {
         platos.add(p);
-        System.out.println("✅ Se agregó el plato '" + p.getNombre() + "' al pedido " + idPedido);
+        System.out.println(" Se agregó el plato '" + p.getNombre() + "' al pedido " + idPedido);
     }
 
     public double calcularTotal() {
@@ -55,13 +77,5 @@ public class Pedido {
 
     public ArrayList<Plato> getPlatos() {
         return platos;
-    }
-
-    public Cliente getCliente() {
-        return cliente;
-    }
-
-    public Mesa getMesa() {
-        return mesa;
     }
 }

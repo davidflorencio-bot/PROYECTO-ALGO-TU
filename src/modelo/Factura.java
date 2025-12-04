@@ -20,11 +20,11 @@ public class Factura {
     }
 
     public void mostrarFactura() {
-        System.out.println("\n--- FACTURA #" + idFactura + " ---");
-        System.out.println("Cliente: " + pedido.getCliente().getNombre());
-        System.out.println("Mesa: " + pedido.getMesa().getNumero());
-        System.out.println("Fecha: " + fechaEmision);
-        System.out.println("Total: S/" + total);
-        System.out.println("--------------------------\n");
+    System.out.println("\n--- FACTURA #" + idFactura + " ---");
+    System.out.println("Cliente: " + pedido.getNombreCliente());  // ¡CAMBIO!
+    System.out.println("Mesa: " + pedido.getNumeroMesa());        // ¡CAMBIO!
+    System.out.println("Fecha: " + fechaEmision);
+    System.out.println("Total: S/" + total);
+    System.out.println("--------------------------\n");
     }
-}
+}   

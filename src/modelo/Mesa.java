@@ -20,9 +20,9 @@ public class Mesa {
     public void reservar() {
         if (disponible) {
             disponible = false;
-            System.out.println("✅ Mesa " + numero + " reservada.");
+            System.out.println(" Mesa " + numero + " reservada.");
         } else {
-            System.out.println("⚠️ La mesa " + numero + " ya está ocupada.");
+            System.out.println("️ La mesa " + numero + " ya está ocupada.");
         }
     }
 

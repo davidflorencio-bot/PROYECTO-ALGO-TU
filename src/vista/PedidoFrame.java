@@ -236,7 +236,7 @@ public class PedidoFrame extends JFrame {
             int respuesta = JOptionPane.showConfirmDialog(this,
                 "¿Confirmar cobro del pedido?\n" +
                 "Pedido #: " + idOrden + "\n" +
-                "Mesa: M" + pedido.getMesa().getNumero() + "\n" +
+                "Mesa: M" + pedido.getNumeroMesa() + "\n" +
                 "Total a cobrar: S/" + String.format("%.2f", total),
                 "Cobrar Pedido", 
                 JOptionPane.YES_NO_OPTION);
@@ -244,7 +244,7 @@ public class PedidoFrame extends JFrame {
             if (respuesta == JOptionPane.YES_OPTION) {
                 if (pedidoDAO.cobrarPedido(idOrden)) {
                     JOptionPane.showMessageDialog(this, 
-                        "✅ Pedido #" + idOrden + " cobrado exitosamente\n" +
+                        " Pedido #" + idOrden + " cobrado exitosamente\n" +
                         "Total: S/" + String.format("%.2f", total) + "\n" +
                         "El pedido ahora aparecera en los reportes");
                     
@@ -562,7 +562,7 @@ public class PedidoFrame extends JFrame {
                 for (Pedido pedido : pedidosListos) {
                     modelPedidosListos.addRow(new Object[]{
                         "PED-" + pedido.getIdPedido(),
-                        "M" + pedido.getMesa().getNumero(),
+                        "M" + pedido.getNumeroMesa(),
                         String.format("S/%.2f", pedido.calcularTotal())
                     });
                 }

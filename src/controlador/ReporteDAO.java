@@ -151,10 +151,10 @@ public class ReporteDAO {
     String sql = "SELECT p.nombre, SUM(d.cantidad) as total_vendido, " +
                 "SUM(d.cantidad * d.precio_unitario) as ingresos " +
                 "FROM detalle_orden d " +
-                "JOIN platos p ON d.id_plato = p.id_plato " +  // ✅ CORREGIDO
+                "JOIN platos p ON d.id_plato = p.id_plato " +  
                 "JOIN ordenes o ON d.id_orden = o.id_orden " +
                 "WHERE o.estado = 'cobrado' " +
-                "GROUP BY p.id_plato, p.nombre " +  // ✅ CORREGIDO
+                "GROUP BY p.id_plato, p.nombre " +  
                 "ORDER BY total_vendido DESC " +
                 "LIMIT 10";
     

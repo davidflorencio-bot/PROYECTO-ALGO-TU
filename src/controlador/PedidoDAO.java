@@ -1,8 +1,6 @@
 package controlador;
 
 import modelo.Pedido;
-import modelo.Cliente;
-import modelo.Mesero;
 import modelo.Mesa;
 import modelo.Plato;
 import java.sql.*;
@@ -132,7 +130,7 @@ public class PedidoDAO {
     
     public List<Pedido> obtenerPedidosParaCocina() {
     List<Pedido> pedidos = new ArrayList<>();
-    String sql = "SELECT o.id_orden, o.estado, o.total, m.numero_mesa, o.nombre_cliente " +  // ✅ CORREGIDO
+    String sql = "SELECT o.id_orden, o.estado, o.total, m.numero_mesa, o.nombre_cliente " +  
                 "FROM ordenes o JOIN mesas m ON o.id_mesa = m.id_mesa " +
                 "WHERE o.estado IN ('pendiente', 'en_cocina') " +
                 "ORDER BY o.fecha_creacion";
@@ -145,7 +143,7 @@ public class PedidoDAO {
             int idOrden = rs.getInt("id_orden");
             String estado = rs.getString("estado");
             double total = rs.getDouble("total");
-            String numeroMesa = rs.getString("numero_mesa");  // ✅ numero_mesa
+            String numeroMesa = rs.getString("numero_mesa");  
             String nombreCliente = rs.getString("nombre_cliente");
             
             Pedido pedido = crearPedidoDesdeBD(idOrden, estado, numeroMesa, nombreCliente);
@@ -246,18 +244,19 @@ public class PedidoDAO {
     }
     
     public boolean finalizarPedido(int idOrden) {
-        System.out.println("⚠️ ADVERTENCIA: finalizarPedido() está deprecado. Usar enviarACocina() o cobrarPedido()");
+        System.out.println(" ADVERTENCIA: finalizarPedido() está deprecado. Usar enviarACocina() o cobrarPedido()");
         return false;
     }
     
     private Pedido crearPedidoDesdeBD(int idOrden, String estado, String numeroMesa, String nombreCliente) {
         try {
             int numero = Integer.parseInt(numeroMesa.replace("M", ""));
-            Mesa mesa = new Mesa(0, numero, 4);
-            Cliente cliente = new Cliente(0, nombreCliente != null ? nombreCliente : "Cliente", "00000000", "presencial");
-            Mesero mesero = new Mesero(0, "Mesero", "turno");
-            
-            Pedido pedido = new Pedido(cliente, mesero, mesa);
+            Pedido pedido = new Pedido(
+            nombreCliente,   
+            "Mesero",         
+            numero,           
+            4                 
+            );
             pedido.setIdPedido(idOrden);
             pedido.setEstado(estado);
             
